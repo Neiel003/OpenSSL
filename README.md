@@ -1,15 +1,15 @@
-<table>
+<table width="100%">
   <tr>
     <td align="left" width="50%">
-      <img src="Imagenes/Logo1.png" alt="Logo 1" width="120">
+      <img src="Imagenes/Logo1.png" alt="Logo UTP" width="100">
     </td>
     <td align="right" width="50%">
-      <img src="Imagenes/Logo2.png" alt="Logo 2" width="120">
+      <img src="Imagenes/Logo2.png" alt="Logo FISC" width="100">
     </td>
   </tr>
 </table>
 
-<h1 align="center">Implementación y documentación de funciones criptográficas con OpenSSL en PHP</h1>
+<h2 align="center">UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</h2>
 
 <p align="center">
   <strong>Universidad Tecnológica de Panamá</strong><br>
