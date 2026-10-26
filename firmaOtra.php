@@ -7,10 +7,10 @@ Ese bloque que te generó es un certificado X.509 en formato PEM,
 y todo indica que la creación y firma del certificado fue exitosa
 */
 
-define("OPEN_SSL_CONF_PATH", "C:/OpenSSL-Win64/bin/cnf/openssl.cnf");
+define("OPEN_SSL_CONF_PATH", 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf');
 define("OPEN_SSL_CERT_DAYS_VALID", 365);
 $configArgs = array(
-    'config' => 'C:\OpenSSL-Win64\bin\cnf\openssl.cnf',
+    'config' => 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf',
     'private_key_bits' => 2048,
     'private_key_type' => OPENSSL_KEYTYPE_RSA
 );

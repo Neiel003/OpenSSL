@@ -5,7 +5,7 @@ $datos = 'Este texto será firmado. Thanks for your attention :)';
 //A continuación el array de configuración para la creación del juego de claves
 
 $configArgs = array(
-    'config' => 'C:\OpenSSL-Win64\bin\cnf\openssl.cnf', //<-- esta ruta es necesaria si trabajas con XAMPP
+   'config' => 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf', //<-- esta ruta es necesaria si trabajas con XAMPP
     'private_key_bits' => 2048,
     'private_key_type' => OPENSSL_KEYTYPE_RSA
 );
