@@ -1,12 +1,9 @@
-<div align="left">
-  <img src="Imagenes/Logo1.png" alt="Logo UTP" width="90">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <img src="Imagenes/Logo1.png" alt="Logo UTP" width="100" align="left">
+  <img src="Imagenes/Logo2.png" alt="Logo FISC" width="100" align="right">
 </div>
 
-<div align="right">
-  <img src="Imagenes/Logo2.png" alt="Logo FISC" width="90">
-</div>
-
-<h2 align="center">UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</h2>
+<h3 align="center">UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</h3>
 
 <p align="center">
   Facultad de Ingeniería Eléctrica<br>
