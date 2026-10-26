@@ -25,10 +25,17 @@
 2. [Objetivos](#2-objetivos)
 3. [Descripción del proyecto](#3-descripción-del-proyecto)
 4. [Evidencias de ejecución](#4-evidencias-de-ejecución)
-5. [Documentación técnica de las funciones](#5-documentación-técnica-de-las-funciones)
-   - [5.1. FirmaOtra](#51-firmaotra)
-   - [5.2. Firma7](#52-firma7)
-   - [5.3. FirmaMensaje](#53-firmamensaje)
+5. [Documentación técnica de las funciones](#5-documentación-técnica-de-las-funciones)\
+  - [5.1. DiprenaGuardarAprobacion.php](#51-diprenaguardaraprobacionphp)\
+  - [5.2. Encriptacion.php](#52-encriptacionphp)\
+  - [5.3. FirmarMensaje.php](#53-firmarmensajephp)\
+  - [5.4. Informacion.php](#54-informacionphp)\
+  - [5.5. encriptacionOpenssl_2.php](#55-encriptacionopenssl_2php)\
+  - [5.6. firma4.php](#56-firma4php)\
+  - [5.7. firma7.php](#57-firma7php)\
+  - [5.8. firmaDigital.php](#58-firmadigitalphp)\
+  - [5.9. firmaDiprena.php](#59-firmadiprenaphp)\
+  - [5.10. firmaOtra.php](#510-firmaotraphp)
    - [5.4. Cifrado con OpenSSL](#54-cifrado-con-openssl)
 6. [Investigación sobre Libsodium](#6-investigación-sobre-libsodium)
 7. [Conclusiones personales](#7-conclusiones-personales)
@@ -44,9 +51,6 @@ PHP dispone de la extensión OpenSSL, que permite utilizar diferentes mecanismos
 En este proyecto se trabaja con funciones criptográficas implementadas en PHP mediante OpenSSL. Se documenta el propósito de cada función, sus parámetros, los valores que devuelve y el proceso criptográfico que realiza. Asimismo, se incluyen evidencias de ejecución y una investigación sobre la biblioteca Libsodium como alternativa para implementar operaciones criptográficas en PHP.
 
 # 2. Objetivos
-
-## 2.1. Objetivo:
-
 Que el estudiante aplique el uso de la extensión OpenSSL y librerías criptográficas modernas en PHP, comprendiendo su propósito para proteger datos sensibles (según los lineamientos de cumplimiento de OWASP), mediante la ejecución de  ejemplos prácticos y el análisis de su documentación técnica.
 
 # 3. Descripción del proyecto
