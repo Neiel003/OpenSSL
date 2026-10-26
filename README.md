@@ -102,17 +102,199 @@ Cada evidencia debe corresponder a una ejecución real del proyecto y permitir i
 
 # 5. Documentación técnica de las funciones
 
-Esta sección describe las funciones criptográficas utilizadas en los scripts del proyecto. Para cada una se debe indicar su nombre, propósito, parámetros, valor de retorno y proceso criptográfico.
+En esta sección se documentará cada uno de los 10 archivos PHP del proyecto. Para cada archivo se explicará qué hace el código, cómo funcionan las variables y las funciones utilizadas, cuáles son sus parámetros y qué resultados se obtienen durante su ejecución.
 
-## 5.1. FirmaOtra
+## 5.1. DiprenaGuardarAprobacion.php
 
 ### 5.1.1. Propósito
 
-El script `FirmaOtra` utiliza funciones de OpenSSL en PHP para generar un par de claves, crear una solicitud de firma de certificado (CSR) y generar un certificado digital autofirmado. Finalmente, exporta el certificado y guarda los archivos correspondientes.
+Pendiente de completar a partir del código del archivo `DiprenaGuardarAprobacion.php`.
 
-### 5.1.2. Configuración inicial
+### 5.1.2. Explicación del código
 
-El script define dos constantes:
+Pendiente de completar.
+
+### 5.1.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.1.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.2. Encriptacion.php
+
+### 5.2.1. Propósito
+
+Pendiente de completar a partir del código del archivo `Encriptacion.php`.
+
+### 5.2.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.2.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.2.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.3. FirmarMensaje.php
+
+### 5.3.1. Propósito
+
+Pendiente de completar a partir del código del archivo `FirmarMensaje.php`.
+
+### 5.3.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.3.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.3.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.4. Informacion.php
+
+### 5.4.1. Propósito
+
+Pendiente de completar a partir del código del archivo `Informacion.php`.
+
+### 5.4.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.4.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.4.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.5. encriptacionOpenssl_2.php
+
+### 5.5.1. Propósito
+
+Pendiente de completar a partir del código del archivo `encriptacionOpenssl_2.php`.
+
+### 5.5.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.5.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.5.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.6. firma4.php
+
+### 5.6.1. Propósito
+
+Pendiente de completar a partir del código del archivo `firma4.php`.
+
+### 5.6.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.6.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.6.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.7. firma7.php
+
+### 5.7.1. Propósito
+
+Pendiente de completar a partir del código del archivo `firma7.php`.
+
+### 5.7.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.7.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.7.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.8. firmaDigital.php
+
+### 5.8.1. Propósito
+
+Pendiente de completar a partir del código del archivo `firmaDigital.php`.
+
+### 5.8.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.8.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.8.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.9. firmaDiprena.php
+
+### 5.9.1. Propósito
+
+Pendiente de completar a partir del código del archivo `firmaDiprena.php`.
+
+### 5.9.2. Explicación del código
+
+Pendiente de completar.
+
+### 5.9.3. Funciones utilizadas
+
+Pendiente de identificar las funciones utilizadas en el código.
+
+### 5.9.4. Resultado de la ejecución
+
+Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+
+---
+
+## 5.10. firmaOtra.php
+
+Este código es para generar un certificado digital autofirmado mediante PHP y OpenSSL. El tipo de certificado es X.509.
+
+### 5.10.1. Definición de las constantes
+
+El código comienza con la definición de dos constantes, es decir, se crean valores que no se pueden modificar durante la ejecución del programa. El primer parámetro nos indica el nombre de la constante, mientras que el segundo nos indica el valor que se le asigna.
+
+La primera constante almacena la ruta del archivo de configuración de OpenSSL. El archivo `openssl.cnf` contiene configuraciones que utiliza OpenSSL para realizar operaciones criptográficas.
+
+La segunda constante establece el período de validez del certificado, que en este caso es de 365 días.
 
 ```php
 define("OPEN_SSL_CONF_PATH", 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf');
@@ -120,135 +302,85 @@ define("OPEN_SSL_CONF_PATH", 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf
 define("OPEN_SSL_CERT_DAYS_VALID", 365);
 ```
 
-- `OPEN_SSL_CONF_PATH`: especifica la ruta del archivo de configuración de OpenSSL.
-- `OPEN_SSL_CERT_DAYS_VALID`: establece el período de validez del certificado en 365 días.
+### 5.10.2. Configuración de OpenSSL
 
-La ruta del archivo de configuración corresponde al entorno en el que se desarrolló el script. Si se ejecuta en otro equipo, puede ser necesario modificarla.
+Luego declaramos una variable llamada `$configArgs`, que almacenará la configuración que vamos a utilizar para generar las claves. Dentro de esta definimos la ruta del archivo de configuración de OpenSSL, el tamaño de la clave privada, que será de 2048 bits, y el tipo de algoritmo que vamos a utilizar, que en este caso es RSA.
 
-### 5.1.3. Configuración de OpenSSL
-
-Se utiliza un arreglo para establecer los parámetros de generación de las claves:
+Recordemos que RSA es un algoritmo de criptografía asimétrica, es decir, trabaja con un par de claves: una pública y una privada.
 
 ```php
-$configArgs = [
-    "config" => OPEN_SSL_CONF_PATH,
-    "private_key_bits" => 2048,
-    "private_key_type" => OPENSSL_KEYTYPE_RSA
-];
+$configArgs = array(
+    'config' => 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf',
+    'private_key_bits' => 2048,
+    'private_key_type' => OPENSSL_KEYTYPE_RSA
+);
 ```
 
-Los parámetros utilizados son:
+### 5.10.3. Información del propietario del certificado
 
-| Parámetro | Descripción |
-|---|---|
-| `config` | Ruta del archivo de configuración de OpenSSL. |
-| `private_key_bits` | Tamaño de la clave en bits; en este caso, 2048. |
-| `private_key_type` | Tipo de clave que se generará; en este caso, RSA. |
-
-### 5.1.4. Información del certificado
-
-El arreglo `$dn` contiene los datos que se incorporan a la solicitud de certificado:
+Creamos una variable llamada `$dn`, que en este caso es un conjunto de datos que permite identificar al propietario del certificado. Dentro de esta definimos el país, donde `PA` corresponde a Panamá; la localidad, que tiene asignado el valor `PA-8`; el nombre de la organización, que es `MEF`; el nombre del propietario, que es `Irina Fong`; y, finalmente, su correo electrónico.
 
 ```php
-$dn = [
+$dn = array(
     "countryName" => "PA",
     "localityName" => "PA-8",
     "organizationName" => "MEF",
     "commonName" => "Irina Fong",
     "emailAddress" => "dreamsweb7@gmail.com"
-];
+);
 ```
 
-| Campo | Valor | Descripción |
-|---|---|---|
-| `countryName` | `PA` | Código del país. |
-| `localityName` | `PA-8` | Información de localidad configurada en el script. |
-| `organizationName` | `MEF` | Nombre de la organización. |
-| `commonName` | `Irina Fong` | Nombre común asociado al certificado. |
-| `emailAddress` | `dreamsweb7@gmail.com` | Dirección de correo electrónico. |
+### 5.10.4. Generación del par de claves
 
-Estos valores corresponden a la configuración del script y no deben interpretarse, por sí solos, como una verificación de la identidad de una persona u organización.
-
-### 5.1.5. Funciones utilizadas
-
-#### `openssl_pkey_new()`
-
-**Propósito:** Generar un nuevo par de claves criptográficas.
-
-**Parámetros:**
-
-- `$configArgs`: arreglo con la configuración de OpenSSL y los parámetros de generación de claves.
-
-**Valor de retorno:** Un recurso u objeto que representa la clave privada generada, dependiendo de la versión de PHP, o `false` si ocurre un error.
-
-**Proceso criptográfico:** Se genera una clave privada junto con su clave pública correspondiente. La clave pública puede compartirse; la clave privada debe mantenerse protegida.
-
-Ejemplo de uso:
+Después creamos una variable llamada `$resourceNewKeyPair`, donde almacenaremos el resultado de la generación del par de claves mediante la función `openssl_pkey_new()`. Para esto utilizamos la configuración que definimos anteriormente en `$configArgs`.
 
 ```php
 $resourceNewKeyPair = openssl_pkey_new($configArgs);
 ```
 
-#### `openssl_pkey_get_details()`
+Luego utilizamos una condición `if` para comprobar si ocurrió algún error durante la generación de las claves. Si no se pudieron generar correctamente, se muestra un mensaje de error utilizando `echo` y la función `openssl_error_string()`, que permite obtener información sobre el error. Finalmente, utilizamos `exit` para detener la ejecución del programa.
 
-**Propósito:** Obtener información detallada de una clave.
+```php
+if (!$resourceNewKeyPair) {
+    echo "Error al generar la clave: " . openssl_error_string();
+    exit;
+}
+```
 
-**Parámetros:**
+### 5.10.5. Obtención de los detalles de las claves y creación de la CSR
 
-- `$resourceNewKeyPair`: clave generada anteriormente.
+Creamos una variable llamada `$details`, donde almacenaremos la información del par de claves mediante la función `openssl_pkey_get_details()`. Esta información nos permite acceder a los detalles de las claves generadas.
 
-**Valor de retorno:** Un arreglo con información de la clave, incluida su clave pública, o `false` si ocurre un error.
+Con la variable `$publicKeyPem` almacenamos la clave pública que obtenemos del arreglo `$details`, accediendo al elemento `key`.
 
-**Proceso criptográfico:** Permite consultar las características de la clave y obtener la representación de la clave pública.
+Luego creamos una variable llamada `$csr`, donde se almacenará la solicitud de firma del certificado mediante la función `openssl_csr_new()`. Para esto utilizamos los datos del propietario que definimos anteriormente en `$dn`, el par de claves generado y la configuración de OpenSSL.
 
-Ejemplo de uso:
+Esta solicitud contiene los datos del propietario y su clave pública, y se utiliza para generar posteriormente el certificado digital.
 
 ```php
 $details = openssl_pkey_get_details($resourceNewKeyPair);
-$publicKey = $details['key'];
+
+$publicKeyPem = $details['key'];
+
+$csr = openssl_csr_new($dn, $resourceNewKeyPair, $configArgs);
 ```
 
-#### `openssl_csr_new()`
-
-**Propósito:** Crear una solicitud de firma de certificado (CSR).
-
-**Parámetros:**
-
-- `$dn`: información que se incorporará a la solicitud.
-- `$resourceNewKeyPair`: clave privada utilizada para generar la solicitud.
-- `$configArgs`: configuración de OpenSSL.
-
-**Valor de retorno:** Una solicitud de certificado o `false` si ocurre un error.
-
-**Proceso criptográfico:** Se crea una solicitud que contiene los datos configurados y la información de la clave pública correspondiente. Una CSR puede presentarse a una autoridad certificadora para solicitar un certificado.
-
-Ejemplo de uso:
+Después utilizamos una condición `if` para comprobar si la solicitud del certificado se creó correctamente. Si ocurre algún error, se muestra un mensaje indicando que no se pudo crear la CSR y se detiene la ejecución del programa.
 
 ```php
-$csr = openssl_csr_new(
-    $dn,
-    $resourceNewKeyPair,
-    $configArgs
-);
+if (!$csr) {
+    echo "Error al crear la CSR: " . openssl_error_string();
+    exit;
+}
 ```
 
-#### `openssl_csr_sign()`
+### 5.10.6. Generación del certificado autofirmado
 
-**Propósito:** Generar un certificado a partir de una solicitud de certificado.
+Luego creamos una variable llamada `$sscert`, donde almacenaremos el certificado generado mediante la función `openssl_csr_sign()`. Para esto utilizamos la solicitud del certificado, el valor `null` como certificado emisor, la clave privada y la configuración de OpenSSL. También establecemos una validez de 365 días mediante la constante `OPEN_SSL_CERT_DAYS_VALID`.
 
-**Parámetros:**
+Como no se proporciona un certificado emisor externo, se genera un certificado autofirmado.
 
-- `$csr`: solicitud de certificado previamente creada.
-- `null`: indica que no se proporciona un certificado emisor.
-- `$resourceNewKeyPair`: clave privada utilizada para firmar el certificado.
-- `OPEN_SSL_CERT_DAYS_VALID`: período de validez en días.
-- `$configArgs`: configuración de OpenSSL.
-
-**Valor de retorno:** Un certificado X.509 o `false` si ocurre un error.
-
-**Proceso criptográfico:** En este script se genera un certificado autofirmado, ya que no se proporciona un certificado emisor. Esto permite crear un certificado para pruebas, aunque no implica que una entidad externa haya verificado la identidad indicada.
-
-Ejemplo de uso:
+Después utilizamos otra condición `if` para comprobar si el certificado se generó y firmó correctamente. Si ocurre algún error, se muestra un mensaje indicando que no se pudo firmar la solicitud y se detiene la ejecución del programa.
 
 ```php
 $sscert = openssl_csr_sign(
@@ -258,22 +390,18 @@ $sscert = openssl_csr_sign(
     OPEN_SSL_CERT_DAYS_VALID,
     $configArgs
 );
+
+if (!$sscert) {
+    echo "Error al firmar la CSR: " . openssl_error_string();
+    exit;
+}
 ```
 
-#### `openssl_x509_export()`
+### 5.10.7. Exportación del certificado
 
-**Propósito:** Exportar un certificado X.509 a una representación textual.
+Utilizamos la función `openssl_x509_export()` para exportar el certificado generado y almacenar su contenido en una variable llamada `$certout`. De esta manera, obtenemos el certificado en formato PEM para poder mostrarlo o guardarlo en un archivo.
 
-**Parámetros:**
-
-- `$sscert`: certificado que se desea exportar.
-- `$certout`: variable en la que se almacenará el certificado exportado.
-
-**Valor de retorno:** `true` si la exportación se realiza correctamente o `false` si ocurre un error.
-
-**Proceso criptográfico:** Convierte el certificado a una representación que puede guardarse o mostrarse.
-
-Ejemplo de uso:
+Después utilizamos `echo` para mostrar el contenido de la variable `$certout`, que contiene el certificado digital generado. De esta manera, podemos visualizar el certificado en pantalla.
 
 ```php
 openssl_x509_export($sscert, $certout);
@@ -281,88 +409,27 @@ openssl_x509_export($sscert, $certout);
 echo $certout;
 ```
 
-#### `file_put_contents()`
+### 5.10.8. Almacenamiento de los archivos
 
-**Propósito:** Guardar información en un archivo.
+Luego utilizamos la función `file_put_contents()` para guardar el certificado en un archivo llamado `certout.csr`, dentro de la carpeta `keysCert`.
 
-**Parámetros:**
+En este caso, aunque el archivo tiene la extensión `.csr`, lo que estamos guardando realmente es el certificado digital y no la solicitud de certificado. Por eso, sería más claro utilizar una extensión como `.crt` o `.pem`.
 
-- Ruta del archivo de destino.
-- Contenido que se escribirá en el archivo.
+Finalmente, utilizamos nuevamente `file_put_contents()` para guardar la clave privada, que se encuentra almacenada en la variable `$privkey`, dentro de un archivo llamado `privkey.pem`, en la carpeta `keysCert`.
 
-**Valor de retorno:** Número de bytes escritos o `false` si ocurre un error.
+Es importante mantener este archivo protegido, ya que contiene la clave privada que se generó al inicio del programa y no debe publicarse en el repositorio.
 
-**Proceso:** Esta función no realiza una operación criptográfica. Se utiliza para almacenar en archivos el certificado exportado y la clave privada exportada.
+```php
+file_put_contents('keysCert/certout.csr', $certout);
 
-En este proyecto se utilizan las rutas:
+file_put_contents('keysCert/privkey.pem', $privkey);
+```
 
-- `keysCert/certout.csr`
-- `keysCert/privkey.pem`
+### 5.10.9. Resumen del proceso
 
-**Nota:** La extensión `.csr` suele utilizarse para solicitudes de firma de certificado. Si el contenido guardado corresponde al certificado generado por `openssl_x509_export()`, sería más claro utilizar una extensión como `.crt` o `.pem`. La extensión no cambia el contenido del archivo.
+En resumen, este código permite generar un par de claves RSA, crear una solicitud de firma de certificado, generar un certificado digital autofirmado y exportarlo en formato PEM. Finalmente, guarda los archivos correspondientes para poder utilizarlos posteriormente.
 
-**Importante:** La clave privada debe mantenerse protegida y no debe publicarse en el repositorio.
-
-
-## 5.2. Firma7
-
-### 5.2.1. Propósito
-
-En esta sección se documentará el funcionamiento del script `Firma7`, de acuerdo con el código utilizado en el proyecto.
-
-### 5.2.2. Funciones utilizadas
-
-| Nombre de la función | Propósito | Parámetros | Valor de retorno |
-|---|---|---|---|
-| Pendiente de documentar | Se completará a partir del código de `Firma7`. | Pendiente de revisar el código. | Pendiente de revisar el código. |
-
-### 5.2.3. Proceso criptográfico
-
-Pendiente de completar después de revisar el código y comprobar la ejecución del script.
-
-### 5.2.4. Evidencia
-
-Pendiente de incorporar la captura de pantalla real de la ejecución.
-
-## 5.3. FirmaMensaje
-
-### 5.3.1. Propósito
-
-En esta sección se documentará el funcionamiento del script `FirmaMensaje`, de acuerdo con el código utilizado en el proyecto.
-
-### 5.3.2. Funciones utilizadas
-
-| Nombre de la función | Propósito | Parámetros | Valor de retorno |
-|---|---|---|---|
-| Pendiente de documentar | Se completará a partir del código de `FirmaMensaje`. | Pendiente de revisar el código. | Pendiente de revisar el código. |
-
-### 5.3.3. Proceso criptográfico
-
-Pendiente de completar después de revisar el código y comprobar la ejecución del script.
-
-### 5.3.4. Evidencia
-
-Pendiente de incorporar la captura de pantalla real de la ejecución.
-
-## 5.4. Cifrado con OpenSSL
-
-### 5.4.1. Propósito
-
-Esta sección documentará el script de cifrado implementado con OpenSSL en PHP, explicando cómo se procesa la información y qué funciones criptográficas se utilizan.
-
-### 5.4.2. Funciones utilizadas
-
-| Nombre de la función | Propósito | Parámetros | Valor de retorno |
-|---|---|---|---|
-| Pendiente de identificar | Se completará a partir del código del script de cifrado. | Pendiente de revisar el código. | Pendiente de revisar el código. |
-
-### 5.4.3. Proceso criptográfico
-
-Pendiente de completar a partir del código real del script, identificando el algoritmo utilizado, los parámetros necesarios y el resultado de la operación.
-
-### 5.4.4. Evidencia
-
-Pendiente de incorporar la captura de pantalla real de la ejecución.
+**Nota:** Para confirmar que el script funciona correctamente, es necesario comprobar que la variable `$privkey` esté definida y contenga la clave privada exportada antes de guardarla en el archivo `privkey.pem`. Esa parte no aparece en el fragmento de código documentado.
 
 # 6. Investigación sobre Libsodium
 
