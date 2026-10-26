@@ -1,10 +1,11 @@
-<table width="100%">
+
+<table width="100%" style="border: none;">
   <tr>
-    <td align="left" width="50%">
-      <img src="Imagenes/Logo1.png" alt="Logo UTP" width="100">
+    <td align="left" width="50%" style="border: none;">
+      <img src="Imagenes/Logo1.png" alt="Logo UTP" width="90">
     </td>
-    <td align="right" width="50%">
-      <img src="Imagenes/Logo2.png" alt="Logo FISC" width="100">
+    <td align="right" width="50%" style="border: none;">
+      <img src="Imagenes/Logo2.png" alt="Logo FISC" width="90">
     </td>
   </tr>
 </table>
@@ -12,7 +13,6 @@
 <h2 align="center">UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</h2>
 
 <p align="center">
-  <strong>Universidad Tecnológica de Panamá</strong><br>
   Facultad de Ingeniería Eléctrica<br>
   Asignatura: Desarrollo de Web<br>
   <strong>Profesora:</strong> Ing. Irina Fong<br><br>
