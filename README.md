@@ -8,6 +8,7 @@
 <p align="center">
   Facultad de Ingeniería Eléctrica<br>
   Asignatura: Desarrollo de Web<br>
+  Laboratorio de OpenSSL<br>
   <strong>Profesora:</strong> Ing. Irina Fong<br><br>
   <strong>Integrantes:</strong><br>
   Vasti Legaspi<br>
@@ -44,26 +45,15 @@ En este proyecto se trabaja con funciones criptográficas implementadas en PHP m
 
 # 2. Objetivos
 
-## 2.1. Objetivo general
+## 2.1. Objetivo:
 
-Implementar y documentar funciones criptográficas en PHP utilizando OpenSSL, comprendiendo su funcionamiento y su aplicación en la protección de la información.
-
-## 2.2. Objetivos específicos
-
-- Identificar las funciones criptográficas utilizadas en los scripts del proyecto.
-- Explicar el propósito de cada función, sus parámetros y los valores que devuelve.
-- Comprender el proceso de generación de claves y certificados digitales.
-- Ejecutar los scripts y documentar sus resultados mediante evidencias.
-- Investigar las características y aplicaciones de la biblioteca Libsodium en PHP.
-- Reconocer la importancia de utilizar mecanismos criptográficos adecuados para proteger la información.
+Que el estudiante aplique el uso de la extensión OpenSSL y librerías criptográficas modernas en PHP, comprendiendo su propósito para proteger datos sensibles (según los lineamientos de cumplimiento de OWASP), mediante la ejecución de  ejemplos prácticos y el análisis de su documentación técnica.
 
 # 3. Descripción del proyecto
 
 El proyecto consiste en implementar y documentar funciones criptográficas mediante PHP y OpenSSL. Para ello, se analizan los scripts proporcionados, se identifica la finalidad de las operaciones criptográficas y se explica el funcionamiento de las funciones utilizadas.
 
 Entre las operaciones que se documentan se encuentran la generación de claves, la creación de solicitudes de firma de certificados, la generación y exportación de certificados digitales y las operaciones de firma y cifrado que correspondan a los scripts del proyecto.
-
-También se investigará Libsodium, una biblioteca criptográfica que ofrece funciones para realizar operaciones como el cifrado autenticado y el procesamiento seguro de contraseñas.
 
 ## 3.1. Tecnologías utilizadas
 
@@ -313,18 +303,6 @@ En este proyecto se utilizan las rutas:
 
 **Importante:** La clave privada debe mantenerse protegida y no debe publicarse en el repositorio.
 
-### 5.1.6. Resumen del proceso
-
-El proceso realizado por el script puede resumirse así:
-
-1. Configurar OpenSSL y los parámetros de generación de claves.
-2. Definir los datos que se incorporarán a la solicitud del certificado.
-3. Generar el par de claves criptográficas.
-4. Obtener los detalles de la clave y su representación pública.
-5. Crear la solicitud de firma de certificado.
-6. Generar el certificado autofirmado.
-7. Exportar el certificado a texto.
-8. Guardar los archivos correspondientes.
 
 ## 5.2. Firma7
 
