@@ -1,14 +1,10 @@
+<div align="left">
+  <img src="Imagenes/Logo1.png" alt="Logo UTP" width="90">
+</div>
 
-<table width="100%" style="border: none;">
-  <tr>
-    <td align="left" width="50%" style="border: none;">
-      <img src="Imagenes/Logo1.png" alt="Logo UTP" width="90">
-    </td>
-    <td align="right" width="50%" style="border: none;">
-      <img src="Imagenes/Logo2.png" alt="Logo FISC" width="90">
-    </td>
-  </tr>
-</table>
+<div align="right">
+  <img src="Imagenes/Logo2.png" alt="Logo FISC" width="90">
+</div>
 
 <h2 align="center">UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</h2>
 
