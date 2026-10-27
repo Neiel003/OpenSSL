@@ -226,25 +226,122 @@ Pendiente de documentar con base en el funcionamiento del script y su resultado 
 
 ---
 
-## 5.7. firma7.php
+## 5.7. ✍️ Firma7
 
-### 5.7.1. Propósito
+## 5.7. ✍️ Firma y verificación de un mensaje
 
-Pendiente de completar a partir del código del archivo `firma7.php`.
+En este código vamos a trabajar con las firmas digitales usando OpenSSL. Lo que haremos primero es crear un mensaje, después generar una clave pública y una privada, utilizar la clave privada para firmar el mensaje y, al final, comprobar con la clave pública si la firma es válida.
 
-### 5.7.2. Explicación del código
+### 5.7.1. Texto que se quiere firmar
 
-Pendiente de completar.
+```php
+$datos = 'Este texto será firmado. Thanks for your attention :)';
+```
 
-### 5.7.3. Funciones utilizadas
+Primero tenemos el texto que queremos firmar. En este caso es una frase que vamos a utilizar durante todo el proceso para crear la firma digital y después comprobar que los datos no hayan sido modificados.
 
-Pendiente de identificar las funciones utilizadas en el código.
+### 5.7.2. Configuración para crear las claves
 
-### 5.7.4. Resultado de la ejecución
+```php
+$configArgs = array(
+   'config' => 'C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf',
+   'private_key_bits' => 2048,
+   'private_key_type' => OPENSSL_KEYTYPE_RSA
+);
+```
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+Aquí tenemos la configuración que necesita OpenSSL para generar las claves. Se indica la ruta del archivo `openssl.cnf`, que en mi caso corresponde a la instalación de WAMP. También se establece que las claves serán de 2048 bits y que se utilizará el algoritmo RSA.
 
----
+### 5.7.3. Generar el par de claves
+
+```php
+$resourceNewKeyPair = openssl_pkey_new($configArgs);
+
+if (!$resourceNewKeyPair) {
+    echo 'Puede que tengas problemas con la ruta indicada en el array de configuración "$configArgs" ';
+    echo openssl_error_string();
+    exit;
+}
+```
+
+En esta parte generamos el par de claves que vamos a necesitar: la pública y la privada. Si OpenSSL no logra crearlas, se muestra un mensaje indicando que puede haber un problema con la configuración y también se muestra el error que ocurrió. Después, `exit` detiene el programa para que no siga ejecutándose si algo salió mal.
+
+### 5.7.4. Obtener la clave pública
+
+```php
+$details = openssl_pkey_get_details($resourceNewKeyPair);
+$publicKeyPem = $details['key'];
+```
+
+Una vez que ya tenemos las claves, usamos `openssl_pkey_get_details()` para obtener sus detalles. De ahí sacamos la clave pública y la guardamos en la variable `$publicKeyPem`, ya que más adelante la vamos a necesitar para comprobar la firma digital.
+
+### 5.7.5. Obtener la clave privada
+
+```php
+if (!openssl_pkey_export($resourceNewKeyPair, $privateKeyPem, NULL, $configArgs)) {
+    echo openssl_error_string();
+    exit;
+}
+```
+
+Ahora obtenemos la clave privada y la guardamos como texto en la variable `$privateKeyPem`. Si ocurre algún error al exportarla, se muestra el mensaje de OpenSSL y se detiene el programa.
+
+En este caso se utiliza `NULL`, por lo que no se establece una contraseña para proteger la clave privada. Por eso hay que tener cuidado con el archivo donde se guarda, ya que no debe quedar disponible para cualquier persona.
+
+### 5.7.6. Guardar las claves en archivos
+
+```php
+file_put_contents('keys/private_key.pem', $privateKeyPem);
+file_put_contents('keys/public_key.pem', $publicKeyPem);
+```
+
+Aquí guardamos las dos claves dentro de la carpeta `keys`. La clave privada se almacena en `private_key.pem` y la pública en `public_key.pem`. La privada debe mantenerse protegida, mientras que la pública se puede compartir para que otras personas puedan verificar las firmas.
+
+Para que esto funcione, la carpeta `keys` debe existir antes de ejecutar el código.
+
+### 5.7.7. Leer la clave privada desde el archivo
+
+```php
+$privateKeyPem = file_get_contents('keys/private_key.pem');
+$resourcePrivateKey = openssl_get_privatekey($privateKeyPem);
+```
+
+Aunque ya habíamos guardado la clave privada en una variable, aquí la volvemos a leer desde el archivo `private_key.pem`. De esta manera, podemos utilizar la clave guardada en disco para continuar con el proceso. Después, `openssl_get_privatekey()` convierte el contenido en una clave que OpenSSL puede utilizar para firmar el mensaje.
+
+### 5.7.8. Crear la firma digital
+
+```php
+if (!openssl_sign($datos, $firma, $resourcePrivateKey, OPENSSL_ALGO_SHA256)) {
+    echo openssl_error_string();
+    exit;
+}
+```
+
+Aquí es donde creamos la firma digital del mensaje. La función `openssl_sign()` utiliza el texto que queremos firmar, la clave privada y el algoritmo SHA-256 para generar la firma, que queda guardada en la variable `$firma`.
+
+Si no se puede generar la firma, se muestra el error correspondiente y se detiene el programa.
+
+### 5.7.9. Guardar la firma en un archivo
+
+```php
+file_put_contents('keys/signature.dat', $firma);
+```
+
+Después de crear la firma, la guardamos en el archivo `signature.dat`, dentro de la carpeta `keys`. Así queda almacenada y se puede utilizar posteriormente sin tener que generar una firma nueva cada vez.
+
+### 5.7.10. Comprobar si la firma es válida
+
+```php
+if (openssl_verify($datos, $firma, $publicKeyPem, 'sha256WithRSAEncryption') === 1) {
+    echo 'la firma es valida y los datos son confiables';
+} else {
+    echo 'la firma es invalida y/o los datos fueron alterados';
+}
+```
+
+Por último, comprobamos si la firma digital es válida. Para esto usamos `openssl_verify()`, que revisa el mensaje, la firma que generamos y la clave pública.
+
+Si la función devuelve `1`, significa que la firma es válida para ese mensaje. En ese caso, se muestra el mensaje que indica que la firma es válida y los datos son confiables. Si devuelve otro resultado, se muestra el mensaje de que la firma no es válida o que los datos pudieron haber sido alterados. También puede ocurrir un error durante la verificación, así que un resultado distinto de `1` no significa necesariamente que alguien haya modificado el mensaje.
 
 ## 5.8. 🔑 firmaDigital.php
 
