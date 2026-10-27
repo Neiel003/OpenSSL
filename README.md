@@ -407,20 +407,6 @@ if (openssl_verify($datos, $firma, $publicKeyPem, 'sha256WithRSAEncryption') ===
 }
 ```
 
-### 5.9.11. Resumen del proceso
-
-En resumen, este código permite generar una firma digital a partir de los datos almacenados en `$datos`, utilizando una clave privada y el algoritmo SHA-256. Después guarda la firma en archivos, registra su ruta en dos tablas de la base de datos y finalmente utiliza la clave pública para comprobar si la firma corresponde a los datos originales.
-
-De esta manera, se puede verificar la integridad de los datos y comprobar que la firma corresponde a la clave pública utilizada. Sin embargo, para considerar confiable la identidad de quien firmó, también es necesario establecer que la clave pública pertenece realmente a esa persona o entidad.
-
-### 5.9.12. Consideraciones del código
-
-- Las variables `$datos`, `$idCargoActual` y `$tbCargo` deben estar definidas previamente para que el código funcione correctamente.
-- Es necesario comprobar que los archivos de las claves existan y puedan leerse.
-- La clave privada debe mantenerse protegida y no debe publicarse en el repositorio.
-- El código utiliza `mysql_query()`, una función de la extensión antigua `mysql` de PHP, que fue eliminada en PHP 7. Para ejecutar este código en versiones modernas de PHP, sería necesario adaptar las consultas a MySQLi o PDO.
-- Las consultas SQL construidas directamente mediante variables deben revisarse para evitar inyecciones SQL. También es recomendable comprobar el resultado de las operaciones de firma, escritura de archivos y consultas a la base de datos.
-
 ## 5.10. 🔏 firmaOtra.php
 
 Este código es para generar un certificado digital autofirmado mediante PHP y OpenSSL. El tipo de certificado es X.509.
@@ -561,12 +547,6 @@ file_put_contents('keysCert/certout.csr', $certout);
 
 file_put_contents('keysCert/privkey.pem', $privkey);
 ```
-
-### 5.10.9. Resumen del proceso
-
-En resumen, este código permite generar un par de claves RSA, crear una solicitud de firma de certificado, generar un certificado digital autofirmado y exportarlo en formato PEM. Finalmente, guarda los archivos correspondientes para poder utilizarlos posteriormente.
-
-**Nota:** Para confirmar que el script funciona correctamente, es necesario comprobar que la variable `$privkey` esté definida y contenga la clave privada exportada antes de guardarla en el archivo `privkey.pem`. Esa parte no aparece en el fragmento de código documentado.
 
 # 6. 🧪 Investigación sobre Libsodium
 
