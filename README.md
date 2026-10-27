@@ -266,25 +266,160 @@ Pendiente de documentar con base en el funcionamiento del script y su resultado 
 
 ---
 
-## 5.9. firmaDiprena.php
+## 5.9. 🔏 firmaDiprena.php
 
-### 5.9.1. Propósito
+### 5.9.1. Inicialización de la variable
 
-Pendiente de completar a partir del código del archivo `firmaDiprena.php`.
+Primero creamos una variable llamada `$firma`, a la que le asignamos una cadena vacía. En esta variable vamos a almacenar la firma digital que se generará más adelante.
 
-### 5.9.2. Explicación del código
+```php
+$firma = "";
+```
 
-Pendiente de completar.
+### 5.9.2. Lectura de las claves desde los archivos
 
-### 5.9.3. Funciones utilizadas
+Luego utilizamos la función `file_get_contents()` para leer los archivos que contienen las claves. Con la variable `$privateKeyPem` almacenamos el contenido del archivo `private_key.pem`, que contiene la clave privada, mientras que en `$publicKeyPem` almacenamos el contenido del archivo `public_key.pem`, que contiene la clave pública.
 
-Pendiente de identificar las funciones utilizadas en el código.
+Estas claves se utilizan para generar y verificar la firma digital. La clave privada se utiliza para firmar los datos, mientras que la clave pública se utiliza posteriormente para comprobar si la firma es válida.
 
-### 5.9.4. Resultado de la ejecución
+```php
+$privateKeyPem = file_get_contents('keys/private_key.pem');
+$publicKeyPem = file_get_contents('keys/public_key.pem');
+```
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+### 5.9.3. Obtención de la clave privada
 
----
+Después creamos una variable llamada `$resourcePrivateKey`, donde almacenamos la clave privada mediante la función `openssl_get_privatekey()`. Para esto utilizamos el contenido que obtuvimos anteriormente en `$privateKeyPem`.
+
+De esta manera, obtenemos la clave privada en un formato que OpenSSL puede utilizar para realizar la operación de firma digital.
+
+```php
+$resourcePrivateKey = openssl_get_privatekey($privateKeyPem);
+```
+
+### 5.9.4. Generación de la firma digital
+
+Luego utilizamos la función `openssl_sign()` para generar la firma digital de los datos que se encuentran almacenados en la variable `$datos`. El resultado de esta operación se guarda en la variable `$firma`, mientras que `$resourcePrivateKey` contiene la clave privada que utilizaremos para firmar.
+
+También utilizamos el algoritmo `OPENSSL_ALGO_SHA256`, que indica que se empleará SHA-256 para calcular el resumen de los datos antes de realizar la firma digital con la clave privada.
+
+Después utilizamos una condición `if` para comprobar si la firma se generó correctamente. Si ocurre algún error, se muestra el mensaje correspondiente mediante `openssl_error_string()` y se detiene la ejecución del programa utilizando `exit`.
+
+```php
+if (!openssl_sign($datos, $firma, $resourcePrivateKey, OPENSSL_ALGO_SHA256)) {
+    echo openssl_error_string();
+    exit;
+}
+```
+
+### 5.9.5. Almacenamiento de la firma digital
+
+Después de generar la firma, creamos una variable llamada `$archivo`, donde almacenamos la ruta y el nombre del archivo que contendrá la firma digital.
+
+El nombre del archivo se construye utilizando el texto `signature`, el valor de la variable `$idCargoActual` y la extensión `.dat`. De esta manera, el archivo tendrá un nombre relacionado con el identificador del cargo actual.
+
+Luego utilizamos la función `file_put_contents()` para guardar la firma digital en dos ubicaciones. Primero, la guardamos en la carpeta `keys` y después en la carpeta `Bethel`, utilizando la misma ruta relativa.
+
+```php
+$archivo = 'keys/signature'.$idCargoActual.'.dat';
+
+file_put_contents($archivo, $firma);
+file_put_contents('../Bethel/'.$archivo, $firma);
+```
+
+Es importante mencionar que la firma se guarda como datos binarios, por lo que el archivo `.dat` no necesariamente se podrá leer directamente como texto.
+
+### 5.9.6. Visualización de la firma
+
+Luego utilizamos `echo` para mostrar un mensaje junto con el contenido de la variable `$firma`. De esta manera, podemos visualizar el resultado de la firma digital generado anteriormente.
+
+```php
+echo "la firma es:".$firma."<br>";
+```
+
+En este caso, la etiqueta HTML `<br>` se utiliza para realizar un salto de línea en la salida que se muestra en el navegador.
+
+### 5.9.7. Preparación de los datos para actualizar la base de datos
+
+Después creamos una variable llamada `$string`, donde almacenamos una instrucción que contiene el nombre del campo `firma` y la ruta del archivo que contiene la firma digital.
+
+También creamos una variable llamada `$update_str`, donde almacenamos la condición que relaciona el registro con el identificador del cargo actual, utilizando la variable `$idCargoActual`.
+
+En el código aparecen algunas líneas comentadas que muestran una actualización que se había considerado anteriormente, pero que actualmente no se ejecuta porque tienen `//` al inicio.
+
+```php
+$string = "firma = '$archivo'";
+$update_str = "idCargo ='$idCargoActual'";
+
+//$sql->update("cargo","$string","$update_str");
+//echo $update_str;
+//echo "<br>";
+//echo "UPDATE $tbCargo SET '$string' WHERE $update_str";
+//echo "<br>";
+//echo "<br>";
+```
+
+### 5.9.8. Actualización de la tabla del cargo
+
+Luego creamos una variable llamada `$consulta1`, donde almacenamos una consulta SQL que actualiza el campo `firma` de la tabla cuyo nombre se encuentra en `$tbCargo`.
+
+La consulta guarda la ruta del archivo de la firma digital en el registro cuyo identificador coincide con `$idCargoActual`.
+
+Después utilizamos `mysql_query()` para ejecutar la consulta y realizar la actualización en la base de datos.
+
+```php
+$consulta1 = "UPDATE $tbCargo SET firma = '$archivo' WHERE $update_str";
+
+mysql_query($consulta1);
+```
+
+### 5.9.9. Actualización de la tabla tramitescargo
+
+Después creamos una segunda consulta SQL en la variable `$consulta2`. Esta vez actualizamos directamente la tabla `tramitescargo`, asignando la ruta del archivo de la firma al campo `firma`.
+
+La condición `WHERE` permite identificar el registro que se debe actualizar mediante el valor de `$idCargoActual`.
+
+Finalmente, utilizamos nuevamente `mysql_query()` para ejecutar la consulta.
+
+```php
+$consulta2 = "UPDATE tramitescargo SET firma = '$archivo' WHERE id ='$idCargoActual'";
+
+mysql_query($consulta2);
+```
+
+De esta manera, la ruta del archivo que contiene la firma digital queda registrada en las dos tablas que se utilizan en el código.
+
+### 5.9.10. Verificación de la firma digital
+
+Finalmente, utilizamos la función `openssl_verify()` para comprobar si la firma digital corresponde a los datos originales.
+
+Para realizar esta comprobación utilizamos `$datos`, que contiene la información que se firmó; `$firma`, que contiene la firma digital generada; y `$publicKeyPem`, que contiene la clave pública. También especificamos el algoritmo `sha256WithRSAEncryption` para realizar la verificación.
+
+La función devuelve `1` si la firma es válida, `0` si la firma no coincide con los datos y `-1` si ocurre un error durante la verificación. Por eso, utilizamos una condición `if` para comprobar si el resultado es exactamente `1`.
+
+Si la firma es válida, se muestra un mensaje indicando que los datos son confiables. En caso contrario, se muestra un mensaje indicando que la firma es inválida o que los datos pudieron haber sido alterados.
+
+```php
+if (openssl_verify($datos, $firma, $publicKeyPem, 'sha256WithRSAEncryption') === 1) {
+    echo 'la firma es valida y los datos son confiables';
+} else {
+    echo 'la firma es invalida y/o los datos fueron alterados';
+}
+```
+
+### 5.9.11. Resumen del proceso
+
+En resumen, este código permite generar una firma digital a partir de los datos almacenados en `$datos`, utilizando una clave privada y el algoritmo SHA-256. Después guarda la firma en archivos, registra su ruta en dos tablas de la base de datos y finalmente utiliza la clave pública para comprobar si la firma corresponde a los datos originales.
+
+De esta manera, se puede verificar la integridad de los datos y comprobar que la firma corresponde a la clave pública utilizada. Sin embargo, para considerar confiable la identidad de quien firmó, también es necesario establecer que la clave pública pertenece realmente a esa persona o entidad.
+
+### 5.9.12. Consideraciones del código
+
+- Las variables `$datos`, `$idCargoActual` y `$tbCargo` deben estar definidas previamente para que el código funcione correctamente.
+- Es necesario comprobar que los archivos de las claves existan y puedan leerse.
+- La clave privada debe mantenerse protegida y no debe publicarse en el repositorio.
+- El código utiliza `mysql_query()`, una función de la extensión antigua `mysql` de PHP, que fue eliminada en PHP 7. Para ejecutar este código en versiones modernas de PHP, sería necesario adaptar las consultas a MySQLi o PDO.
+- Las consultas SQL construidas directamente mediante variables deben revisarse para evitar inyecciones SQL. También es recomendable comprobar el resultado de las operaciones de firma, escritura de archivos y consultas a la base de datos.
 
 ## 5.10. 🔏 firmaOtra.php
 
