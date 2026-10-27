@@ -19,30 +19,28 @@
 
 ---
 
-# Índice
-
-1. [Introducción](#1-introducción)
-2. [Objetivos](#2-objetivos)
-3. [Descripción del proyecto](#3-descripción-del-proyecto)
-4. [Evidencias de ejecución](#4-evidencias-de-ejecución)
-5. [Documentación técnica de las funciones](#5-documentación-técnica-de-las-funciones)\
-  - [5.1. DiprenaGuardarAprobacion.php](#51-diprenaguardaraprobacionphp)\
-  - [5.2. Encriptacion.php](#52-encriptacionphp)\
-  - [5.3. FirmarMensaje.php](#53-firmarmensajephp)\
-  - [5.4. Informacion.php](#54-informacionphp)\
-  - [5.5. encriptacionOpenssl_2.php](#55-encriptacionopenssl_2php)\
-  - [5.6. firma4.php](#56-firma4php)\
-  - [5.7. firma7.php](#57-firma7php)\
-  - [5.8. firmaDigital.php](#58-firmadigitalphp)\
-  - [5.9. firmaDiprena.php](#59-firmadiprenaphp)\
-  - [5.10. firmaOtra.php](#510-firmaotraphp)
-   - [5.4. Cifrado con OpenSSL](#54-cifrado-con-openssl)
-6. [Investigación sobre Libsodium](#6-investigación-sobre-libsodium)
-7. [Conclusiones personales](#7-conclusiones-personales)
+# 📑 Índice
+1. [📖 Introducción](#1-introducción)
+2. [🎯 Objetivos](#2-objetivos)
+3. [💻 Descripción del proyecto](#3-descripción-del-proyecto)
+4. [🖼️ Evidencias de ejecución](#4-evidencias-de-ejecución)
+5. [🔐 Documentación técnica de las funciones](#5-documentación-técnica-de-las-funciones)
+   - [📂 5.1. DiprenaGuardarAprobacion.php](#51-diprenaguardaraprobacionphp)
+   - [🔒 5.2. Encriptacion.php](#52-encriptacionphp)
+   - [✍️ 5.3. FirmarMensaje.php](#53-firmarmensajephp)
+   - [ℹ️ 5.4. Informacion.php](#54-informacionphp)
+   - [🔑 5.5. encriptacionOpenssl_2.php](#55-encriptacionopenssl_2php)
+   - [📝 5.6. firma4.php](#56-firma4php)
+   - [🛡️ 5.7. firma7.php](#57-firma7php)
+   - [📜 5.8. firmaDigital.php](#58-firmadigitalphp)
+   - [🏛️ 5.9. firmaDiprena.php](#59-firmadiprenaphp)
+   - [🔏 5.10. firmaOtra.php](#510-firmaotraphp)
+6. [🧪 Investigación sobre Libsodium](#6-investigación-sobre-libsodium)
+7. [💭 Conclusiones personales](#7-conclusiones-personales)
 
 ---
 
-# 1. Introducción
+# 1. 📖 Introducción
 
 La criptografía es una herramienta fundamental para proteger la información en los sistemas informáticos, ya que permite implementar mecanismos de confidencialidad, integridad, autenticación y verificación de identidad.
 
@@ -50,23 +48,23 @@ PHP dispone de la extensión OpenSSL, que permite utilizar diferentes mecanismos
 
 En este proyecto se trabaja con funciones criptográficas implementadas en PHP mediante OpenSSL. Se documenta el propósito de cada función, sus parámetros, los valores que devuelve y el proceso criptográfico que realiza. Asimismo, se incluyen evidencias de ejecución y una investigación sobre la biblioteca Libsodium como alternativa para implementar operaciones criptográficas en PHP.
 
-# 2. Objetivos
+# 2. 🎯 Objetivos
 Que el estudiante aplique el uso de la extensión OpenSSL y librerías criptográficas modernas en PHP, comprendiendo su propósito para proteger datos sensibles (según los lineamientos de cumplimiento de OWASP), mediante la ejecución de  ejemplos prácticos y el análisis de su documentación técnica.
 
-# 3. Descripción del proyecto
+# 3. 💻 Descripción del proyecto
 
 El proyecto consiste en implementar y documentar funciones criptográficas mediante PHP y OpenSSL. Para ello, se analizan los scripts proporcionados, se identifica la finalidad de las operaciones criptográficas y se explica el funcionamiento de las funciones utilizadas.
 
 Entre las operaciones que se documentan se encuentran la generación de claves, la creación de solicitudes de firma de certificados, la generación y exportación de certificados digitales y las operaciones de firma y cifrado que correspondan a los scripts del proyecto.
 
-## 3.1. Tecnologías utilizadas
+## 3.1. 🔩 Tecnologías utilizadas
 
 - **PHP:** lenguaje de programación utilizado para implementar los scripts.
 - **OpenSSL:** extensión y biblioteca criptográfica utilizada para realizar las operaciones correspondientes.
 - **Libsodium:** biblioteca criptográfica investigada como parte del proyecto.
 - **GitHub:** plataforma utilizada para almacenar y documentar el proyecto.
 
-# 4. Evidencias de ejecución
+# 4. 🖼️ Evidencias de ejecución
 
 En esta sección se deben incorporar las capturas de pantalla que demuestren la ejecución de los scripts y los resultados obtenidos.
 
@@ -104,7 +102,7 @@ Cada evidencia debe corresponder a una ejecución real del proyecto y permitir i
 
 <!-- Insertar aquí la captura real de ejecución del cifrado con OpenSSL. -->
 
-# 5. Documentación técnica de las funciones
+# 5. 🔐 Documentación técnica de las funciones
 
 En esta sección se documentará cada uno de los 10 archivos PHP del proyecto. Para cada archivo se explicará qué hace el código, cómo funcionan las variables y las funciones utilizadas, cuáles son sus parámetros y qué resultados se obtienen durante su ejecución.
 
@@ -288,7 +286,7 @@ Pendiente de documentar con base en el funcionamiento del script y su resultado 
 
 ---
 
-## 5.10. firmaOtra.php
+## 5.10. 🔏 firmaOtra.php
 
 Este código es para generar un certificado digital autofirmado mediante PHP y OpenSSL. El tipo de certificado es X.509.
 
@@ -435,7 +433,7 @@ En resumen, este código permite generar un par de claves RSA, crear una solicit
 
 **Nota:** Para confirmar que el script funciona correctamente, es necesario comprobar que la variable `$privkey` esté definida y contenga la clave privada exportada antes de guardarla en el archivo `privkey.pem`. Esa parte no aparece en el fragmento de código documentado.
 
-# 6. Investigación sobre Libsodium
+# 6. 🧪 Investigación sobre Libsodium
 
 ## 6.1. ¿Qué es Libsodium?
 
@@ -542,7 +540,7 @@ sodium_memzero($clave);
 | Cifrado | Permite utilizar distintos algoritmos y configuraciones. | Ofrece funciones específicas para cifrado autenticado, como `sodium_crypto_secretbox()`. |
 | Contraseñas | Dispone de herramientas criptográficas, según las funciones utilizadas. | Incluye funciones especializadas para derivar claves a partir de contraseñas. |
 
-# 7. Conclusiones personales
+# 7. 💭 Conclusiones personales
 
 ## 7.1. Conclusión de Vasti Legaspi
 
