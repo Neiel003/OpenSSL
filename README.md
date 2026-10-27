@@ -246,24 +246,74 @@ Pendiente de documentar con base en el funcionamiento del script y su resultado 
 
 ---
 
-## 5.8. firmaDigital.php
+## 5.8. 🔑 firmaDigital.php
 
-### 5.8.1. Propósito
+### 5.8.1. Generación del par de claves
 
-Pendiente de completar a partir del código del archivo `firmaDigital.php`.
+Primero utilizamos la función `openssl_pkey_new()` para generar un nuevo par de claves criptográficas. El resultado lo almacenamos en una variable llamada `$privateKey`, que vamos a utilizar para guardar la clave privada y obtener la clave pública correspondiente.
 
-### 5.8.2. Explicación del código
+Dentro de esta función definimos un arreglo con la configuración que vamos a utilizar. El parámetro `config` nos indica la ruta del archivo de configuración de OpenSSL, `private_key_bits` establece el tamaño de la llave en 2048 bits y `private_key_type` indica el tipo de algoritmo que vamos a utilizar, que en este caso es RSA.
 
-Pendiente de completar.
+Recordemos que RSA es un algoritmo de criptografía asimétrica, es decir, trabaja con dos claves relacionadas entre sí: una pública y una privada.
 
-### 5.8.3. Funciones utilizadas
+```php
+$privateKey = openssl_pkey_new(array(
+    "config" => "C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf",
+    'private_key_bits' => 2048, // Tamaño de la llave
+    'private_key_type' => OPENSSL_KEYTYPE_RSA,
+));
+```
 
-Pendiente de identificar las funciones utilizadas en el código.
+### 5.8.2. Almacenamiento de la clave privada
 
-### 5.8.4. Resultado de la ejecución
+Luego utilizamos la función `openssl_pkey_export_to_file()` para guardar la clave privada generada en un archivo llamado `private.key`.
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+El primer parámetro corresponde a la clave privada que generamos anteriormente, el segundo indica el nombre del archivo donde se guardará, el tercero permite establecer una contraseña para proteger la clave y el cuarto contiene las opciones de configuración de OpenSSL.
 
+En este caso, el tercer parámetro tiene el valor `null`, por lo que no se establece una contraseña para proteger la clave privada mediante esta función. Por eso, es importante mantener este archivo protegido y no compartirlo con nadie, ya que contiene la clave privada que se utilizará en futuras operaciones criptográficas.
+
+```php
+openssl_pkey_export_to_file(
+    $privateKey,
+    'private.key',
+    null,
+    ["config" => "C:/wamp64/bin/apache/apache2.4.65/conf/openssl.cnf"]
+);
+```
+
+### 5.8.3. Obtención de la clave pública
+
+Después utilizamos la función `openssl_pkey_get_details()` para obtener información detallada del par de claves que generamos anteriormente. Esta información se almacena en una variable llamada `$a_key`.
+
+Dentro de los datos que devuelve la función se encuentra la clave pública. Para acceder a ella, utilizamos el elemento `key` del arreglo `$a_key`.
+
+```php
+$a_key = openssl_pkey_get_details($privateKey);
+```
+
+De esta manera, obtenemos la información de la clave generada y podemos acceder a la clave pública correspondiente a la clave privada.
+
+### 5.8.4. Almacenamiento de la clave pública
+
+Luego utilizamos la función `file_put_contents()` para guardar la clave pública en un archivo llamado `public.key`.
+
+Como primer parámetro indicamos el nombre del archivo donde se guardará la información y, como segundo parámetro, utilizamos `$a_key['key']`, que contiene la clave pública obtenida anteriormente.
+
+A diferencia de la clave privada, la clave pública se puede compartir con otras personas para que la utilicen en las operaciones criptográficas correspondientes. Por ejemplo, puede utilizarse para cifrar información que posteriormente se descifrará con la clave privada correspondiente, siempre que se utilice un esquema de cifrado compatible.
+
+```php
+file_put_contents('public.key', $a_key['key']);
+```
+
+### 5.8.5. Liberación de la clave
+
+Finalmente, el código original utiliza la función `openssl_free_key()` para liberar el recurso asociado a la clave que se encuentra almacenada en `$privateKey`.
+
+```php
+openssl_free_key($privateKey);
+```
+
+Sin embargo, al ejecutar el código en una versión moderna de PHP, esta función genera una advertencia porque está obsoleta (*deprecated*). Por este motivo, se puede eliminar esta línea, ya que PHP administra automáticamente la memoria de los objetos de clave cuando dejan de utilizarse.
 ---
 
 ## 5.9. 🔏 firmaDiprena.php
