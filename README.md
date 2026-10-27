@@ -106,123 +106,562 @@ Cada evidencia debe corresponder a una ejecución real del proyecto y permitir i
 
 En esta sección se documentará cada uno de los 10 archivos PHP del proyecto. Para cada archivo se explicará qué hace el código, cómo funcionan las variables y las funciones utilizadas, cuáles son sus parámetros y qué resultados se obtienen durante su ejecución.
 
-## 5.1. DiprenaGuardarAprobacion.php
+## 5.1. 📂 DiprenaGuardarAprobacion.php
 
-### 5.1.1. Propósito
+En este archivo se procesa la aprobación de los trámites de DIPRENA. Lo que hace es consultar los trámites seleccionados, obtener sus datos, actualizar la información de aprobación en la base de datos y generar una réplica del cargo y de los datos personales. Al final, prepara la información que se va a firmar y llama al archivo `firmaDiprena.php`, donde se realiza el proceso de firma digital.
 
-Pendiente de completar a partir del código del archivo `DiprenaGuardarAprobacion.php`.
+### 5.1.1. Incluir los archivos necesarios
 
-### 5.1.2. Explicación del código
+Primero se incluyen varios archivos que contienen funciones y clases que necesita este código para funcionar. Por ejemplo, `Barricada.php`, `VariablesSesiones.php` y `utils.php`, además de los archivos relacionados con la conexión a la base de datos, los cargos, las réplicas, las fechas y las cadenas de texto.
 
-Pendiente de completar.
+Cada archivo aporta funciones o información que se utiliza en distintas partes del proceso.
 
-### 5.1.3. Funciones utilizadas
+```php
+include("Barricada.php");
+$menu01 = " id=\"current\"";
 
-Pendiente de identificar las funciones utilizadas en el código.
+include("VariablesSesiones.php");
+include("comunes/utils.php");
 
-### 5.1.4. Resultado de la ejecución
+include("clases/conexionAdmin.php");
+include("clases/objClase.php");
+include("clases/obj_CargoReplica.php");
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+include("comunes/funcionObjeto.php");
+include("comunes/getSiafaData.php");
+
+//include("comunes/libreriaBitSocial.php");
+include("comunes/librerias_fecha.php");
+include("comunes/Libreria_String.php");
+```
+
+La línea que empieza con `//` está comentada, por lo que PHP no la ejecuta.
+
+### 5.1.2. Obtener la fecha del sistema
+
+Después definimos algunas variables que guardan la fecha actual. `$indicadorValue` se establece en `3`, mientras que `$FechaSistema`, `$anio_`, `$mes_` y `$dia_` almacenan la fecha en distintos formatos.
+
+Esto sirve para registrar cuándo se aprobó el trámite y guardar por separado el día, el mes y el año.
+
+```php
+$indicadorValue = 3;
+$FechaSistema = date("Y-m-d");
+$anio_ = date("Y");
+$mes_ = date("n");
+$dia_ = date("j");
+```
+
+- `date("Y-m-d")`: obtiene la fecha completa, por ejemplo, `2026-10-26`.
+- `date("Y")`: obtiene el año con cuatro dígitos.
+- `date("n")`: obtiene el número del mes sin un cero inicial.
+- `date("j")`: obtiene el día del mes sin un cero inicial.
+
+### 5.1.3. Obtener los trámites seleccionados
+
+En esta parte se obtiene el contenido de `aprobarDIPRENA` desde `$_REQUEST`. Después se crea el arreglo `$datosfirmados`, que se utilizará para almacenar o manejar los datos relacionados con la información que se va a firmar.
+
+```php
+$aprobarDIPRENA = $_REQUEST['aprobarDIPRENA'];
+
+$datosfirmados = array();
+```
+
+La variable `$aprobarDIPRENA` contiene los trámites seleccionados para su aprobación. El código espera que pueda recorrerse como un arreglo.
+
+### 5.1.4. Recorrer los trámites y consultar la base de datos
+
+Ahora usamos `foreach` para recorrer cada trámite seleccionado. `$key` representa el identificador del trámite y `$value` contiene el valor asociado a ese identificador.
+
+Por cada trámite se prepara una consulta SQL para buscar su registro en la tabla `tramitescargo`. Luego, `mysql_query()` ejecuta la consulta y `mysql_num_rows()` permite saber cuántos registros se encontraron.
+
+```php
+foreach ($aprobarDIPRENA as $key => $value) {
+
+    $consultaTramitesRev = "select * from tramitescargo where id = '$key'";
+    $sqlQueryTramitesRev = mysql_query($consultaTramitesRev);
+    $numCargoRev = mysql_num_rows($sqlQueryTramitesRev);
+```
+
+De esta forma, el código puede trabajar con cada trámite por separado. Si se encuentra al menos un registro, continúa con el procesamiento.
+
+### 5.1.5. Obtener los datos del trámite
+
+Si la consulta encuentra registros, se utiliza `mysql_fetch_object()` para obtener uno de ellos como un objeto. Después se extraen tres datos: la naturaleza de la acción, la dependencia y la posición.
+
+```php
+    if ($numCargoRev > 0) {
+
+        $regTramitesRev = mysql_fetch_object($sqlQueryTramitesRev);
+
+        $tipoAccionRev = $regTramitesRev->NaturalezaAccion;
+        $dependenciaRev = $regTramitesRev->Dependencia;
+        $Posicion = $regTramitesRev->Posicion;
+```
+
+Estos valores se utilizan más adelante para consultar la jefatura correspondiente y actualizar los contadores relacionados con la aprobación.
+
+### 5.1.6. Consultar la jefatura de Recursos Humanos
+
+Después se utiliza `getSiafaData()` para buscar información en la tabla `roles`, filtrando por la dependencia, la excepción de rol y el estado activo. El identificador del resultado se guarda en `$idJefeRRHH`.
+
+```php
+        $regJefaturaRRHH = getSiafaData(
+            "roles",
+            "Dependencia = $dependenciaRev and ExcepcionRol = 2 and Activo = 1",
+            "id"
+        );
+
+        $idJefeRRHH = $regJefaturaRRHH->id;
+```
+
+Con esto se obtiene el identificador de la jefatura de Recursos Humanos que corresponde según las condiciones de la consulta.
+
+### 5.1.7. Actualizar los contadores
+
+En esta parte se llaman tres funciones que actualizan o calculan los números relacionados con los trámites aprobados. Cada una recibe los datos necesarios para trabajar con el año, la dependencia, la posición o el tipo de acción.
+
+```php
+        $ResueltoPersonalNumero = actualizarResueltosPersonal(
+            $dependenciaRev,
+            $anio_
+        );
+
+        $NumeroPosicionAprobado = actualizarContadoresPosiciones2(
+            $Posicion,
+            $dependenciaRev,
+            $anio_
+        );
+
+        $NumeroDocumentoAprobado = actualizarContadores(
+            $tipoAccionRev,
+            $dependenciaRev,
+            $anio_
+        );
+```
+
+Los resultados se guardan en variables para utilizarlos posteriormente. Por ejemplo, `$NumeroDocumentoAprobado` se incorpora en la actualización del trámite.
+
+### 5.1.8. Actualizar la información de aprobación
+
+Una vez obtenidos los datos necesarios, se ejecuta una consulta `UPDATE` para actualizar el registro de `tramitescargo`. Se guardan el sello de aprobación, el usuario que realiza la operación, la fecha, el indicador, el número del documento aprobado, la fecha del resuelto, la jefatura de Recursos Humanos y el número del resuelto personal.
+
+```php
+        mysql_query("update tramitescargo set Sello3 ='$value',
+                 UsuarioDiprena = '$Usuario',
+                 FechaDiprena = '$FechaSistema',
+                 Indicador = $indicadorValue,
+                 NumeroDocumentoAprobacion = '$NumeroDocumentoAprobado',
+                 DiaResuelto = $dia_,
+                 MesResuelto = $mes_,
+                 AnioResuelto = $anio_,
+                 idJefeRRHH = $idJefeRRHH,
+                 ResueltoPersonal = '$ResueltoPersonalNumero'
+                 where id='$key'");
+```
+
+La condición `where id='$key'` permite identificar el trámite que se está actualizando. De esta manera, la aprobación queda registrada en el registro correspondiente.
+
+### 5.1.9. Generar las réplicas del cargo y los datos personales
+
+Después de actualizar el trámite, se guarda su identificador en `$idCargoActual`. Luego se incluyen dos archivos: `ReplicaCargo.php` y `ReplicaDatosPersonales.php`.
+
+```php
+        $idCargoActual = $key;
+
+        include("replicas/ReplicaCargo.php");
+        include("replicas/ReplicaDatosPersonales.php");
+```
+
+Según los nombres de los archivos y su uso en este código, esta parte corresponde al proceso de réplica del cargo y de los datos personales asociados al trámite.
+
+### 5.1.10. Preparar los datos que se van a firmar
+
+Después se concatenan varios campos del arreglo `$datosfirmados`. Primero se unen la posición, el salario, los gastos de representación y la ocupación. Luego se agregan el número de resuelto personal, la identificación, el nombre y el segundo nombre. Por último, se añaden los apellidos.
+
+```php
+        $datosFirmar = $datosfirmados['Posicion']
+            . $datosfirmados['Salario']
+            . $datosfirmados['Gast_Representacion']
+            . $datosfirmados['Ocupacion'];
+
+        $datosFirmar2 = $datosfirmados['ResueltoPersonal']
+            . $datosfirmados['Identificacion']
+            . $datosfirmados['Nombre']
+            . $datosfirmados['SegundoNombre'];
+
+        $datosFirmar3 = $datosfirmados['Apellido']
+            . $datosfirmados['SegundoApellido'];
+
+        $datos = $datosFirmar . $datosFirmar2 . $datosFirmar3;
+```
+
+El resultado final se guarda en `$datos`, que es la variable que se utiliza como contenido para la firma digital. Es decir, se juntan los datos que se quieren proteger en un solo texto.
+
+### 5.1.11. Llamar al archivo de firma digital
+
+Finalmente, se incluye `firmaDiprena.php`, que es el archivo encargado de continuar con el proceso de firma digital utilizando los datos preparados anteriormente.
+
+```php
+        include("firmaDiprena.php");
+```
+
+Esto permite que la información del trámite pase al proceso de firma sin tener que escribir toda la lógica de la firma digital dentro de este mismo archivo.
+
+### 5.1.12. Finalizar el recorrido y cerrar la conexión
+
+Al terminar de procesar cada trámite, se cierran las estructuras del `if` y del `foreach`. Después se llama a `mysql_close($sql)` para intentar cerrar la conexión a la base de datos.
+
+```php
+    }
+
+} // Fin del foreach
+
+mysql_close($sql);
+
+//redireccionar("Diprena.php");
+?>
+```
+
+La línea `redireccionar("Diprena.php")` está comentada, así que no se ejecuta. Si se quisiera utilizar, habría que quitar los caracteres `//`.
 
 ---
 
-## 5.2. Encriptacion.php
+## 5.2. 🔒 Encriptacion.php
 
-### 5.2.1. Propósito
+En este código vamos a realizar un proceso de cifrado y descifrado utilizando OpenSSL. Primero tenemos un mensaje que queremos proteger, después lo ciframos utilizando el método AES-128-CBC y finalmente lo volvemos a descifrar para comprobar que podemos recuperar el mensaje original.
 
-Pendiente de completar a partir del código del archivo `Encriptacion.php`.
+### 5.2.1. Definir la clave
 
-### 5.2.2. Explicación del código
+Primero creamos la variable `$clave`, donde guardamos el texto que vamos a utilizar como clave para cifrar y descifrar el mensaje. En este caso, la clave tiene 17 caracteres, aunque el comentario original indica 16. Para AES-128 se necesitan 16 bytes de clave; OpenSSL puede ajustar la clave proporcionada según sus reglas, pero lo recomendable es utilizar una clave del tamaño adecuado.
 
-Pendiente de completar.
+```php
+$clave = "clave123456789012"; // Clave utilizada para el cifrado
+```
 
-### 5.2.3. Funciones utilizadas
+### 5.2.2. Generar el vector de inicialización (IV)
 
-Pendiente de identificar las funciones utilizadas en el código.
+Después generamos el IV, que es un valor que se utiliza junto con el método AES-128-CBC durante el cifrado. Primero usamos `openssl_cipher_iv_length()` para obtener la longitud que necesita ese método y luego `openssl_random_pseudo_bytes()` para generar el valor aleatorio.
 
-### 5.2.4. Resultado de la ejecución
+```php
+$iv = openssl_random_pseudo_bytes(
+    openssl_cipher_iv_length("AES-128-CBC")
+);
+```
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+Este IV también se necesita al momento de descifrar el mensaje, por eso lo conservamos en la variable `$iv`.
+
+### 5.2.3. Definir el mensaje original
+
+Aquí creamos la variable `$texto`, donde guardamos el mensaje que queremos proteger. En este ejemplo, el texto es `"Mensaje secreto"`.
+
+```php
+$texto = "Mensaje secreto";
+```
+
+### 5.2.4. Cifrar el mensaje
+
+En esta parte usamos `openssl_encrypt()` para cifrar el mensaje. La función recibe el texto original, el método de cifrado, la clave, las opciones y el IV. El resultado queda guardado en `$cifrado`.
+
+```php
+$cifrado = openssl_encrypt(
+    $texto,
+    "AES-128-CBC",
+    $clave,
+    0,
+    $iv
+);
+```
+
+El valor `0` indica que el resultado se devuelve codificado en Base64, lo que facilita mostrarlo como texto. Aunque se vea como una cadena, el mensaje ya está cifrado y no se puede leer directamente como el original.
+
+### 5.2.5. Mostrar el resultado del cifrado
+
+Después usamos `echo` para mostrar el resultado del cifrado en pantalla. El operador `.` permite unir el texto del mensaje con el contenido de la variable `$cifrado`, y `<br>` agrega un salto de línea en la página.
+
+```php
+echo "el resultado del cifrado es el siguiente " . $cifrado . "<br>";
+```
+
+### 5.2.6. Descifrar el mensaje
+
+Ahora hacemos el proceso contrario utilizando `openssl_decrypt()`. Le pasamos el texto cifrado, el mismo método, la misma clave, las mismas opciones y el mismo IV. Si todo funciona correctamente, recuperamos el mensaje original y lo guardamos en `$descifrado`.
+
+```php
+$descifrado = openssl_decrypt(
+    $cifrado,
+    "AES-128-CBC",
+    $clave,
+    0,
+    $iv
+);
+```
+
+Es importante utilizar la misma clave y el mismo IV que se usaron para cifrar el mensaje. Si alguno de estos valores no coincide, el descifrado puede fallar o devolver datos incorrectos.
+
+### 5.2.7. Mostrar el resultado del descifrado
+
+Por último, mostramos el contenido de `$descifrado` para comprobar que se recuperó el mensaje original.
+
+```php
+echo "el resultado del descifrado es: " . $descifrado . "<br>";
+```
+
+## 5.3. ✍️ FirmarMensaje.php
+
+En este archivo vamos a trabajar con la firma digital de un mensaje. Primero utilizamos la clave privada que se generó anteriormente para firmar el mensaje y después usamos el certificado público para comprobar si esa firma es válida. Así podemos verificar si el mensaje corresponde con la firma generada y si pudo haber sido modificado.
+
+### 5.3.1. Definir el mensaje
+
+Primero creamos la variable `$mensaje`, donde guardamos el texto que queremos firmar. En este caso, el mensaje es `"Este es un mensaje confidencial"` y será el que utilizaremos durante todo el proceso.
+
+```php
+$mensaje = "Este es un mensaje confidencial";
+```
+
+### 5.3.2. Cargar la clave privada
+
+Después usamos `file_get_contents()` para leer la clave privada desde el archivo `privkey.pem`, que se encuentra dentro de la carpeta `keysCert`. Luego utilizamos `openssl_pkey_get_private()` para cargar esa clave y convertirla en un formato que OpenSSL pueda utilizar.
+
+```php
+$privateKey = file_get_contents('keysCert/privkey.pem');
+$privKeyResource = openssl_pkey_get_private($privateKey);
+```
+
+Esta clave es importante porque es la que vamos a utilizar para generar la firma digital. Por eso, debe mantenerse protegida y no compartirse con otras personas.
+
+### 5.3.3. Firmar el mensaje
+
+Aquí usamos `openssl_sign()` para generar la firma digital del mensaje. La función recibe el texto, guarda la firma generada en `$firmaBinaria`, utiliza la clave privada y aplica el algoritmo SHA-256.
+
+```php
+openssl_sign($mensaje, $firmaBinaria, $privKeyResource, OPENSSL_ALGO_SHA256);
+```
+
+Con esto obtenemos una firma que después podemos utilizar para comprobar que el mensaje no haya sido alterado.
+
+### 5.3.4. Convertir la firma a Base64
+
+Como la firma se genera en formato binario, usamos `base64_encode()` para convertirla en una cadena de texto que sea más fácil de almacenar o enviar. El resultado se guarda en `$firmaBase64`.
+
+```php
+$firmaBase64 = base64_encode($firmaBinaria);
+```
+
+### 5.3.5. Mostrar la firma generada
+
+Después utilizamos `echo` para mostrar la firma en Base64. De esta manera podemos ver el resultado que se generó al firmar el mensaje.
+
+```php
+echo "Firma en base64:\n" . $firmaBase64;
+```
+
+### 5.3.6. Cargar el certificado público
+
+Ahora pasamos a la parte de verificación. Primero leemos el archivo `certout.csr` desde la carpeta `keysCert` y después usamos `openssl_pkey_get_public()` para obtener la clave pública que se utilizará para verificar la firma.
+
+```php
+$cert = file_get_contents('keysCert/certout.csr');
+$pubKeyResource = openssl_pkey_get_public($cert);
+```
+
+La clave pública permite verificar la firma sin necesidad de compartir la clave privada. Sin embargo, el archivo debe contener un certificado válido o una clave pública en un formato que OpenSSL pueda reconocer.
+
+### 5.3.7. Recuperar la firma original
+
+Como anteriormente convertimos la firma a Base64, ahora usamos `base64_decode()` para volver a convertirla a formato binario. Esto es necesario porque `openssl_verify()` trabaja con la firma binaria.
+
+```php
+$firmaBinaria = base64_decode($firmaBase64);
+```
+
+### 5.3.8. Verificar la firma digital
+
+En esta parte utilizamos `openssl_verify()` para comprobar la firma. Se le pasan el mensaje original, la firma en formato binario, la clave pública y el algoritmo SHA-256. El resultado se guarda en la variable `$ok`.
+
+```php
+$ok = openssl_verify($mensaje, $firmaBinaria, $pubKeyResource, OPENSSL_ALGO_SHA256);
+```
+
+La función devuelve diferentes valores dependiendo del resultado de la verificación. Por eso, en el siguiente bloque revisamos qué valor se obtuvo.
+
+### 5.3.9. Mostrar el resultado de la verificación
+
+Por último, usamos una estructura `if`, `elseif` y `else` para mostrar un mensaje dependiendo del resultado.
+
+- Si `$ok === 1`, la firma es válida para el mensaje.
+- Si `$ok === 0`, la firma no es válida para ese mensaje.
+- Si se obtiene otro resultado, ocurrió un error durante la verificación y se muestra el mensaje de OpenSSL.
+
+```php
+if ($ok === 1) {
+    echo "✅ Firma válida. El mensaje no fue alterado.";
+} elseif ($ok === 0) {
+    echo "❌ Firma inválida. El mensaje pudo haber sido modificado.";
+} else {
+    echo "⚠ Error al verificar la firma: " . openssl_error_string();
+}
+```
+
+### 5.3.11. En resumen
+
+Con este código aprendimos cómo firmar un mensaje utilizando una clave privada y después verificar esa firma con la clave pública. De esta manera podemos comprobar si la firma corresponde al mensaje que recibimos. Si el mensaje cambia después de haber sido firmado, la verificación debería fallar.
+
+**Importante:** para que el proceso funcione, el archivo `keysCert/privkey.pem` debe contener la clave privada y `keysCert/certout.csr` debe contener un certificado válido o un formato que permita obtener la clave pública. Aunque el archivo tenga la extensión `.csr`, esa extensión normalmente se utiliza para solicitudes de certificado; si contiene el certificado generado, sería más apropiado guardarlo con una extensión como `.crt` o `.pem`. Además, en un programa real conviene comprobar que las funciones de lectura, carga y firma no hayan fallado antes de continuar.
 
 ---
 
-## 5.3. FirmarMensaje.php
+## 5.4. ℹ️ Informacion.php
 
-### 5.3.1. Propósito
+En este archivo vamos a utilizar una función de PHP que nos permite ver información sobre la configuración del lenguaje en nuestro servidor. Esto nos sirve para revisar qué versión de PHP tenemos instalada, qué extensiones están habilitadas y otros detalles que pueden ser útiles cuando estamos trabajando con OpenSSL.
 
-Pendiente de completar a partir del código del archivo `FirmarMensaje.php`.
+### 5.4.1. Abrir el bloque de PHP
 
-### 5.3.2. Explicación del código
+Primero utilizamos `<?PHP` para indicar que a partir de ahí comienza el código PHP que se va a ejecutar en el servidor.
 
-Pendiente de completar.
+```php
+<?PHP
+```
 
-### 5.3.3. Funciones utilizadas
+### 5.4.2. Mostrar la información de PHP
 
-Pendiente de identificar las funciones utilizadas en el código.
+Después utilizamos `phpinfo()`, una función que muestra información detallada sobre la instalación y configuración de PHP. Entre otras cosas, podemos consultar la versión instalada, las extensiones disponibles y algunos parámetros de configuración del servidor.
 
-### 5.3.4. Resultado de la ejecución
+```php
+phpinfo();
+```
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+### 5.4.3. Cerrar el bloque de PHP
 
+Finalmente, utilizamos `?>` para indicar que termina el bloque de código PHP.
+
+```php
+?>
+```
+
+## 5.5. 🔐 encriptacionOpenssl_2.php
+
+En este código vamos a trabajar con el cifrado de información utilizando OpenSSL. Lo que hacemos es cifrar un mensaje, generar un código para comprobar su integridad y finalmente juntar los resultados para mostrarlos en una sola cadena. Para esto utilizamos AES-256-CBC, HMAC y Base64.
+
+### 5.5.1. Preparar las claves
+
+Primero creamos dos variables, `$first_key` y `$second_key`, donde usamos `base64_decode()` para decodificar los textos `"Irina"` y `"Fong"`. El resultado se guarda en cada variable para utilizarlas después durante el proceso.
+
+```php
+$first_key = base64_decode("Irina");
+$second_key = base64_decode("Fong");
+```
+
+**Ojo:** `base64_decode()` no convierte cualquier texto en una clave segura. En este caso, los valores obtenidos no son adecuados para utilizarlos directamente como claves de AES-256 o HMAC.
+
+### 5.5.2. Seleccionar el método de cifrado
+
+Después indicamos el método de cifrado que vamos a utilizar. En este caso es `aes-256-cbc`, que utiliza AES con una clave de 256 bits y el modo CBC.
+
+```php
+$method = "aes-256-cbc";
+```
+
+### 5.5.3. Obtener la longitud del vector de inicialización
+
+Aquí usamos `openssl_cipher_iv_length()` para conocer cuántos bytes necesita el vector de inicialización, también conocido como IV, según el método de cifrado seleccionado.
+
+```php
+$iv_length = openssl_cipher_iv_length($method);
+```
+
+### 5.5.4. Generar el vector de inicialización
+
+Ahora generamos un IV aleatorio con `openssl_random_pseudo_bytes()`. Este valor se utiliza al cifrar el mensaje y después debe conservarse para poder descifrarlo correctamente.
+
+```php
+$iv = openssl_random_pseudo_bytes($iv_length);
+```
+
+### 5.5.5. Cifrar el mensaje
+
+En esta parte ciframos el texto `"Hola como estas"` usando `openssl_encrypt()`. La función recibe el mensaje, el método de cifrado, la primera clave, la opción `OPENSSL_RAW_DATA` y el IV generado anteriormente. El resultado cifrado se guarda en `$first_encrypted`.
+
+```php
+$first_encrypted = openssl_encrypt(
+    "Hola como estas",
+    $method,
+    $first_key,
+    OPENSSL_RAW_DATA,
+    $iv
+);
+```
+
+La opción `OPENSSL_RAW_DATA` hace que el resultado se devuelva en formato binario, en lugar de codificarse automáticamente en Base64.
+
+### 5.5.6. Generar el código de verificación HMAC
+
+Después utilizamos `hash_hmac()` para generar un código de autenticación a partir del mensaje cifrado. En este caso usamos el algoritmo `sha3-512`, el resultado de cifrar el mensaje y la segunda clave. El último parámetro, `TRUE`, indica que el resultado se devuelve en formato binario.
+
+Este código permite comprobar si los datos cifrados fueron modificados, siempre que se utilice una clave HMAC adecuada y se verifique correctamente al descifrar.
+
+```php
+$second_encrypted = hash_hmac(
+    'sha3-512',
+    $first_encrypted,
+    $second_key,
+    TRUE
+);
+```
+
+### 5.5.7. Unir los resultados y codificarlos
+
+Por último, juntamos el IV, el código HMAC y el mensaje cifrado mediante el operador `.`. Después usamos `base64_encode()` para convertir el resultado binario en una cadena de texto que sea más fácil de mostrar o guardar.
+
+```php
+$output = base64_encode($iv . $second_encrypted . $first_encrypted);
+```
+
+### 5.5.8. Mostrar el resultado
+
+Finalmente, usamos `echo` para mostrar la cadena que contiene los datos unidos y codificados en Base64.
+
+```php
+echo $output;
+```
 ---
 
-## 5.4. Informacion.php
+## 5.6. 🔏 firma4.php
 
-### 5.4.1. Propósito
+En este código vamos a trabajar con OpenSSL para crear una solicitud de certificado. Primero configuramos OpenSSL, después generamos una clave y finalmente usamos esa clave para crear una solicitud que contiene el nombre que queremos identificar. En este ejemplo, el nombre que se utiliza es `MyCRS`.
 
-Pendiente de completar a partir del código del archivo `Informacion.php`.
+### 5.6.1. Configuración de OpenSSL
 
-### 5.4.2. Explicación del código
+```php
+$config = array('config'=>'C:\openssl\bin\cnf\openssl.cnf');
+```
 
-Pendiente de completar.
+Primero creamos un arreglo llamado `$config`, donde indicamos la ruta del archivo `openssl.cnf`. Este archivo contiene la configuración que necesita OpenSSL para realizar el proceso. La ruta tiene que coincidir con la ubicación del archivo en nuestro equipo.
 
-### 5.4.3. Funciones utilizadas
+### 5.6.2. Generar la clave
 
-Pendiente de identificar las funciones utilizadas en el código.
+```php
+$pkey = openssl_pkey_new($config);
+```
 
-### 5.4.4. Resultado de la ejecución
+Aquí usamos `openssl_pkey_new()` para generar una clave que vamos a utilizar más adelante. La clave queda guardada en la variable `$pkey`.
 
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+### 5.6.3. Definir el nombre
 
----
+```php
+$dn = array("commonName" => "MyCRS");
+```
 
-## 5.5. encriptacionOpenssl_2.php
+En esta parte creamos el arreglo `$dn`, donde indicamos el nombre común que queremos incluir en la solicitud. En este caso, el nombre es `MyCRS`.
 
-### 5.5.1. Propósito
+### 5.6.4. Crear la solicitud de certificado
 
-Pendiente de completar a partir del código del archivo `encriptacionOpenssl_2.php`.
+```php
+$crs = openssl_csr_new($dn, $pkey, $config);
+```
 
-### 5.5.2. Explicación del código
+Por último, usamos `openssl_csr_new()` para crear la solicitud de certificado. Para esto se utiliza el nombre que definimos anteriormente, la clave generada y la configuración de OpenSSL. El resultado se guarda en la variable `$crs`.
 
-Pendiente de completar.
-
-### 5.5.3. Funciones utilizadas
-
-Pendiente de identificar las funciones utilizadas en el código.
-
-### 5.5.4. Resultado de la ejecución
-
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
-
----
-
-## 5.6. firma4.php
-
-### 5.6.1. Propósito
-
-Pendiente de completar a partir del código del archivo `firma4.php`.
-
-### 5.6.2. Explicación del código
-
-Pendiente de completar.
-
-### 5.6.3. Funciones utilizadas
-
-Pendiente de identificar las funciones utilizadas en el código.
-
-### 5.6.4. Resultado de la ejecución
-
-Pendiente de documentar con base en el funcionamiento del script y su resultado real.
+Hay que tener en cuenta que este código solo crea la solicitud; no genera un certificado firmado ni guarda la clave en un archivo.
 
 ---
 
