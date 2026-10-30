@@ -12,7 +12,7 @@
   <strong>Profesora:</strong> Ing. Irina Fong<br><br>
   <strong>Integrantes:</strong><br>
   Vasti Legaspi<br>
-  Gabriel Herrera<br><br>
+  Gabriel Mendoza<br><br>
   <strong>Fecha de entrega:</strong> 30 de octubre de 2026<br>
   <strong>Período académico:</strong> II semestre de 2026
 </p>
@@ -20,25 +20,27 @@
 ---
 
 # 📑 Índice
-1. [📖 Introducción](#1-introducción)
-2. [🎯 Objetivos](#2-objetivos)
-3. [💻 Descripción del proyecto](#3-descripción-del-proyecto)
-4. [🖼️ Evidencias de ejecución](#4-evidencias-de-ejecución)
-5. [🔐 Documentación técnica de las funciones](#5-documentación-técnica-de-las-funciones)
-   - [📂 5.1. DiprenaGuardarAprobacion.php](#51-diprenaguardaraprobacionphp)
-   - [🔒 5.2. Encriptacion.php](#52-encriptacionphp)
-   - [✍️ 5.3. FirmarMensaje.php](#53-firmarmensajephp)
-   - [ℹ️ 5.4. Informacion.php](#54-informacionphp)
-   - [🔑 5.5. encriptacionOpenssl_2.php](#55-encriptacionopenssl_2php)
-   - [📝 5.6. firma4.php](#56-firma4php)
-   - [🛡️ 5.7. firma7.php](#57-firma7php)
-   - [📜 5.8. firmaDigital.php](#58-firmadigitalphp)
-   - [🏛️ 5.9. firmaDiprena.php](#59-firmadiprenaphp)
-   - [🔏 5.10. firmaOtra.php](#510-firmaotraphp)
-6. [🧪 Investigación sobre Libsodium](#6-investigación-sobre-libsodium)
-7. [💭 Conclusiones personales](#7-conclusiones-personales)
+1. [📖 Introducción](#s1)
+2. [🎯 Objetivos](#s2)
+3. [💻 Descripción del proyecto](#s3)
+4. [🖼️ Evidencias de ejecución](#s4)
+5. [🔐 Documentación técnica de las funciones](#s5)
+   - [📂 5.1. DiprenaGuardarAprobacion.php](#s5-1)
+   - [🔒 5.2. Encriptacion.php](#s5-2)
+   - [✍️ 5.3. FirmarMensaje.php](#s5-3)
+   - [ℹ️ 5.4. Informacion.php](#s5-4)
+   - [🔑 5.5. encriptacionOpenssl_2.php](#s5-5)
+   - [📝 5.6. firma4.php](#s5-6)
+   - [🛡️ 5.7. firma7.php](#s5-7)
+   - [📜 5.8. firmaDigital.php](#s5-8)
+   - [🏛️ 5.9. firmaDiprena.php](#s5-9)
+   - [🔏 5.10. firmaOtra.php](#s5-10)
+6. [🧪 Investigación sobre Libsodium](#s6)
+7. [💭 Conclusiones personales](#s7)
 
 ---
+
+<a id="s1"></a>
 
 # 1. 📖 Introducción
 
@@ -48,8 +50,12 @@ PHP dispone de la extensión OpenSSL, que permite utilizar diferentes mecanismos
 
 En este proyecto se trabaja con funciones criptográficas implementadas en PHP mediante OpenSSL. Se documenta el propósito de cada función, sus parámetros, los valores que devuelve y el proceso criptográfico que realiza. Asimismo, se incluyen evidencias de ejecución y una investigación sobre la biblioteca Libsodium como alternativa para implementar operaciones criptográficas en PHP.
 
+<a id="s2"></a>
+
 # 2. 🎯 Objetivos
 Que el estudiante aplique el uso de la extensión OpenSSL y librerías criptográficas modernas en PHP, comprendiendo su propósito para proteger datos sensibles (según los lineamientos de cumplimiento de OWASP), mediante la ejecución de  ejemplos prácticos y el análisis de su documentación técnica.
+
+<a id="s3"></a>
 
 # 3. 💻 Descripción del proyecto
 
@@ -63,6 +69,8 @@ Entre las operaciones que se documentan se encuentran la generación de claves, 
 - **OpenSSL:** extensión y biblioteca criptográfica utilizada para realizar las operaciones correspondientes.
 - **Libsodium:** biblioteca criptográfica investigada como parte del proyecto.
 - **GitHub:** plataforma utilizada para almacenar y documentar el proyecto.
+
+<a id="s4"></a>
 
 # 4. 🖼️ Evidencias de ejecución
 
@@ -115,7 +123,7 @@ Cada archivo comparte estas piezas:
 
 **Captura de pantalla:**
 
-![Evidencia de FirmaOtra](FO.png)
+![Evidencia de FirmaOtra](Imagenes/FO.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -149,7 +157,7 @@ Cada archivo comparte estas piezas:
 
 **Captura de pantalla:**
 
-![Evidencia de Firma7](F7.png)
+![Evidencia de Firma7](Imagenes/F7.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -193,7 +201,7 @@ Cada archivo comparte estas piezas:
 
 **Captura de pantalla:**
 
-![Evidencia de FirmaMensaje](FD.png)
+![Evidencia de FirmaMensaje](Imagenes/FM.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -220,7 +228,7 @@ La diferencia con Firma7 es que aquí las llaves vienen de un **certificado** (q
 
 **Captura de pantalla:**
 
-![Evidencia de cifrado con OpenSSL](FE.png)
+![Evidencia de cifrado con OpenSSL](Imagenes/FE.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -251,7 +259,7 @@ Aquí **no hay llaves públicas ni privadas**: se usa una sola clave, la que esc
 
 **Captura de pantalla:**
 
-![Evidencia de Firma4](F4.png)
+![Evidencia de Firma4](Imagenes/F4.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -285,7 +293,7 @@ Aquí **no hay llaves públicas ni privadas**: se usa una sola clave, la que esc
 
 **Captura de pantalla:**
 
-![Evidencia de FirmaDiprenaGuardar](FDG.png)
+![Evidencia de FirmaDiprenaGuardar](Imagenes/FDG.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -333,7 +341,7 @@ Aquí intervienen **tres archivos** que trabajan en cadena:
 
 **Captura de pantalla:**
 
-![Evidencia de FirmaDiprena](FDP.png)
+![Evidencia de FirmaDiprena](Imagenes/FD.png)
 
 **Cómo funciona el código, paso a paso:**
 
@@ -349,26 +357,13 @@ Aquí intervienen **tres archivos** que trabajan en cadena:
 
 ---
 
-## Resumen de las funciones `openssl_*` usadas
-
-| Función | Para qué sirve |
-|---|---|
-| `openssl_pkey_new` | Crea un par de llaves (privada y pública). |
-| `openssl_pkey_export` | Convierte la llave privada a texto PEM para guardarla. |
-| `openssl_pkey_get_details` | Obtiene datos de la llave, entre ellos la llave pública. |
-| `openssl_get_privatekey` / `openssl_pkey_get_private` | Carga una llave privada desde su texto PEM. |
-| `openssl_pkey_get_public` | Carga una llave pública (por ejemplo, desde un certificado). |
-| `openssl_sign` | Firma datos con la llave privada. |
-| `openssl_verify` | Comprueba una firma con la llave pública. Devuelve `1` si es válida. |
-| `openssl_csr_new` / `openssl_csr_export` | Crea y exporta una solicitud de certificado (CSR). |
-| `openssl_csr_sign` | Firma una solicitud y crea el certificado. |
-| `openssl_x509_export` / `openssl_x509_parse` / `openssl_x509_fingerprint` | Exporta un certificado, lee sus datos y calcula su huella. |
-| `openssl_encrypt` / `openssl_decrypt` | Cifra y descifra texto con AES. |
-| `openssl_error_string` | Devuelve el texto del último error de OpenSSL. Se usa para mostrar por qué falló algo. |
+<a id="s5"></a>
 
 # 5. 🔐 Documentación técnica de las funciones
 
 En esta sección se documentará cada uno de los 10 archivos PHP del proyecto. Para cada archivo se explicará qué hace el código, cómo funcionan las variables y las funciones utilizadas, cuáles son sus parámetros y qué resultados se obtienen durante su ejecución.
+
+<a id="s5-1"></a>
 
 ## 5.1. 📂 DiprenaGuardarAprobacion.php
 
@@ -590,6 +585,8 @@ La línea `redireccionar("Diprena.php")` está comentada, así que no se ejecuta
 
 ---
 
+<a id="s5-2"></a>
+
 ## 5.2. 🔒 Encriptacion.php
 
 En este código vamos a realizar un proceso de cifrado y descifrado utilizando OpenSSL. Primero tenemos un mensaje que queremos proteger, después lo ciframos utilizando el método AES-128-CBC y finalmente lo volvemos a descifrar para comprobar que podemos recuperar el mensaje original.
@@ -669,6 +666,8 @@ Por último, mostramos el contenido de `$descifrado` para comprobar que se recup
 ```php
 echo "el resultado del descifrado es: " . $descifrado . "<br>";
 ```
+
+<a id="s5-3"></a>
 
 ## 5.3. ✍️ FirmarMensaje.php
 
@@ -766,13 +765,15 @@ if ($ok === 1) {
 }
 ```
 
-### 5.3.11. En resumen
+### 5.3.10. En resumen
 
 Con este código aprendimos cómo firmar un mensaje utilizando una clave privada y después verificar esa firma con la clave pública. De esta manera podemos comprobar si la firma corresponde al mensaje que recibimos. Si el mensaje cambia después de haber sido firmado, la verificación debería fallar.
 
 **Importante:** para que el proceso funcione, el archivo `keysCert/privkey.pem` debe contener la clave privada y `keysCert/certout.csr` debe contener un certificado válido o un formato que permita obtener la clave pública. Aunque el archivo tenga la extensión `.csr`, esa extensión normalmente se utiliza para solicitudes de certificado; si contiene el certificado generado, sería más apropiado guardarlo con una extensión como `.crt` o `.pem`. Además, en un programa real conviene comprobar que las funciones de lectura, carga y firma no hayan fallado antes de continuar.
 
 ---
+
+<a id="s5-4"></a>
 
 ## 5.4. ℹ️ Informacion.php
 
@@ -801,6 +802,8 @@ Finalmente, utilizamos `?>` para indicar que termina el bloque de código PHP.
 ```php
 ?>
 ```
+
+<a id="s5-5"></a>
 
 ## 5.5. 🔐 encriptacionOpenssl_2.php
 
@@ -889,6 +892,8 @@ echo $output;
 ```
 ---
 
+<a id="s5-6"></a>
+
 ## 5.6. 🔏 firma4.php
 
 En este código vamos a trabajar con OpenSSL para crear una solicitud de certificado. Primero configuramos OpenSSL, después generamos una clave y finalmente usamos esa clave para crear una solicitud que contiene el nombre que queremos identificar. En este ejemplo, el nombre que se utiliza es `MyCRS`.
@@ -929,7 +934,7 @@ Hay que tener en cuenta que este código solo crea la solicitud; no genera un ce
 
 ---
 
-## 5.7. ✍️ Firma7
+<a id="s5-7"></a>
 
 ## 5.7. ✍️ Firma y verificación de un mensaje
 
@@ -1046,6 +1051,8 @@ Por último, comprobamos si la firma digital es válida. Para esto usamos `opens
 
 Si la función devuelve `1`, significa que la firma es válida para ese mensaje. En ese caso, se muestra el mensaje que indica que la firma es válida y los datos son confiables. Si devuelve otro resultado, se muestra el mensaje de que la firma no es válida o que los datos pudieron haber sido alterados. También puede ocurrir un error durante la verificación, así que un resultado distinto de `1` no significa necesariamente que alguien haya modificado el mensaje.
 
+<a id="s5-8"></a>
+
 ## 5.8. 🔑 firmaDigital.php
 
 ### 5.8.1. Generación del par de claves
@@ -1115,6 +1122,8 @@ openssl_free_key($privateKey);
 
 Sin embargo, al ejecutar el código en una versión moderna de PHP, esta función genera una advertencia porque está obsoleta (*deprecated*). Por este motivo, se puede eliminar esta línea, ya que PHP administra automáticamente la memoria de los objetos de clave cuando dejan de utilizarse.
 ---
+
+<a id="s5-9"></a>
 
 ## 5.9. 🔏 firmaDiprena.php
 
@@ -1257,6 +1266,8 @@ if (openssl_verify($datos, $firma, $publicKeyPem, 'sha256WithRSAEncryption') ===
 }
 ```
 
+<a id="s5-10"></a>
+
 ## 5.10. 🔏 firmaOtra.php
 
 Este código es para generar un certificado digital autofirmado mediante PHP y OpenSSL. El tipo de certificado es X.509.
@@ -1398,6 +1409,8 @@ file_put_contents('keysCert/certout.csr', $certout);
 file_put_contents('keysCert/privkey.pem', $privkey);
 ```
 
+<a id="s6"></a>
+
 # 6. 🧪 Investigación sobre Libsodium
 
 ## 6.1. ¿Qué es Libsodium?
@@ -1505,16 +1518,20 @@ sodium_memzero($clave);
 | Cifrado | Permite utilizar distintos algoritmos y configuraciones. | Ofrece funciones específicas para cifrado autenticado, como `sodium_crypto_secretbox()`. |
 | Contraseñas | Dispone de herramientas criptográficas, según las funciones utilizadas. | Incluye funciones especializadas para derivar claves a partir de contraseñas. |
 
+<a id="s7"></a>
+
 # 7. 💭 Conclusiones personales
 
 ## 7.1. Conclusión de Vasti Legaspi
 
-Pendiente de completar con la reflexión personal sobre los conocimientos adquiridos durante la implementación y documentación de las funciones criptográficas.
+Este laboratorio me ayudó a entender que la criptografía no es algo abstracto, sino un conjunto de herramientas que se pueden usar paso a paso en PHP. Al documentar los archivos de cifrado y de certificados, vi la diferencia entre trabajar con una sola clave, como en AES, y trabajar con un par de llaves, como en RSA. También aprendí qué es un certificado X.509 autofirmado, cómo se pasa de la llave a la solicitud (CSR) y de ahí al certificado.
 
-## 7.2. Conclusión de Gabriel Herrera
+Lo que más me llamó la atención fueron los detalles que parecen pequeños pero afectan la seguridad: usar una clave del tamaño correcto, guardar el IV junto con el texto cifrado, y entender que base64_decode() no convierte cualquier texto en una clave segura. La investigación de Libsodium me mostró que existen alternativas más modernas, con funciones como sodium_crypto_secretbox() que cifran y verifican la integridad al mismo tiempo, mientras que OpenSSL sigue siendo necesario para trabajar con certificados.
 
-Pendiente de completar con la reflexión personal sobre los conocimientos adquiridos durante el desarrollo del proyecto.
+## 7.2. Conclusión de Gabriel Mendoza
 
----
+Con este proyecto comprendí cómo funciona una firma digital de principio a fin: se genera un par de llaves, se firma el mensaje con la llave privada y cualquiera puede comprobarlo con la llave pública. Ver que openssl_verify() devuelve un resultado distinto cuando se cambia una sola letra del mensaje me dejó claro por qué la firma sirve para garantizar la integridad y la autenticidad de la información.
+
+Convertir los scripts en formularios web también me enseñó que la parte técnica no basta: hay que validar lo que escribe el usuario, escapar los textos que se muestran, proteger la carpeta donde se guardan las llaves y no publicar nunca una llave privada. Además, aprendí a leer los errores de OpenSSL y a tener en cuenta detalles como la ruta de openssl.cnf en WAMP o que la extensión .csr no es la adecuada para un certificado ya firmado. En conjunto, el laboratorio me dio una base práctica para aplicar estos mecanismos en proyectos web reales.
 
 **Repositorio del proyecto:** [SeguridadOpenSSL](https://github.com/Salomon2514/SeguridadOpenSSL.git)
