@@ -70,37 +70,301 @@ En esta sección se deben incorporar las capturas de pantalla que demuestren la 
 
 Cada evidencia debe corresponder a una ejecución real del proyecto y permitir identificar qué función se está probando y cuál fue su resultado.
 
+## Conceptos básicos (para entender el código)
+
+Antes de ver cada formulario conviene entender las palabras que se repiten.
+
+| Concepto | Qué es, en palabras simples |
+|---|---|
+| **Llave privada y llave pública** | Son un par de llaves matemáticas que van juntas. La **privada** es secreta y solo la tiene el dueño. La **pública** se puede repartir a cualquiera. Lo que se firma con la privada solo se puede comprobar con su pública. |
+| **Hash (SHA-256)** | Una "huella digital" del mensaje: un resumen de tamaño fijo. Si cambias una sola letra del mensaje, la huella cambia por completo. |
+| **Firma digital** | La huella del mensaje, protegida con la llave privada. Demuestra dos cosas: que el mensaje lo firmó el dueño de la llave y que nadie lo modificó después. |
+| **Verificar** | Usar la llave pública para comprobar la firma. Si el mensaje o la firma cambiaron, la comprobación falla. |
+| **Certificado X.509** | Un documento que une una llave pública con los datos de una persona u organización (nombre, país, vigencia). Es como una cédula digital. **Autofirmado** significa que se firma con su propia llave, sin una autoridad externa. |
+| **CSR** | Solicitud de certificado. Es el "formulario" que se envía a una autoridad certificadora para que ella emita el certificado. |
+| **Cifrado AES** | Mezcla el texto con una clave para que nadie lo pueda leer. Con la misma clave se vuelve a abrir. Aquí se usa **una sola clave** (no un par). |
+| **Base64** | Una forma de convertir datos binarios (ilegibles) en texto normal, para poder mostrarlos y copiarlos. |
+| **PEM** | El formato de texto en que se guardan llaves y certificados. Se reconoce por las líneas `-----BEGIN ...-----`. |
+| **`openssl.cnf`** | Archivo de configuración de OpenSSL. En WAMP hay que indicarle a PHP dónde está, o no se pueden crear llaves. |
+
+### Cómo están armados todos los formularios
+
+Todos los archivos tienen la misma estructura, de arriba hacia abajo:
+
+1. **Parte PHP (la lógica):** se ejecuta primero en el servidor. Lee lo que el usuario escribió en `$_POST`, lo valida, usa las funciones `openssl_*` y prepara una variable `$resultado`.
+2. **Parte HTML (lo que se ve):** dibuja el formulario. Si existe `$resultado`, muestra el aviso verde o rojo.
+
+Cada archivo comparte estas piezas:
+
+- `$_POST['campo']`: lo que el usuario escribió en el campo con ese nombre.
+- `trim(...)`: quita espacios sobrantes al inicio y al final.
+- `$resultado = ['tipo' => 'ok' o 'error', 'titulo' => ..., 'detalle' => ...]`: guarda el mensaje que se mostrará.
+- `e(...)`: función corta para escapar texto (`htmlspecialchars`). Evita que alguien escriba código HTML o JavaScript en un campo y se ejecute en la página.
+- `name="accion" value="firmar"` en los botones: así el PHP sabe cuál botón se presionó (`$_POST['accion']`).
+- Las funciones `openssl_*` son las que hacen el trabajo criptográfico. En cada formulario se explica cuáles se usan.
+
+---
+
 ## 4.1. Evidencia de FirmaOtra
 
-**Descripción:** En este apartado se colocará la captura de pantalla de la ejecución del script `FirmaOtra` y del resultado obtenido al generar el certificado.
+**Descripción:** En este apartado se muestra la ejecución del script `FirmaOtra` (`Form_FirmaOtra.php`) y el resultado obtenido al generar el certificado. El formulario crea un certificado X.509 autofirmado junto con su llave privada.
+
+**Datos que solicita:** nombre común y país (obligatorios), organización, localidad, correo y vigencia en días (de 1 a 3650).
+
+**Resultado esperado:** aviso verde «Certificado creado», con el titular, las fechas de vigencia, el algoritmo, la huella SHA-256 y el certificado en formato PEM. Los archivos `certout.crt` y `privkey.pem` quedan guardados en `keysCert/<nombre>/`.
 
 **Captura de pantalla:**
 
-<!-- Insertar aquí la captura real de ejecución de FirmaOtra. -->
+![Evidencia de FirmaOtra](FO.png)
+
+**Cómo funciona el código, paso a paso:**
+
+1. **Busca `openssl.cnf`.** Hay una lista `$candidatos` con varias rutas posibles. Un `foreach` prueba cada una con `file_exists` y usa la primera que existe. Esa ruta se guarda en `$config['config']`.
+2. **Define la configuración de la llave:** `private_key_bits => 2048` (tamaño de la llave), `private_key_type => OPENSSL_KEYTYPE_RSA` (tipo de llave) y `digest_alg => 'sha256'` (huella).
+3. **Prepara la carpeta `keysCert/`.** Si no existe, la crea y dentro pone un `.htaccess` con `Require all denied` para que nadie pueda descargar las llaves desde el navegador.
+4. **Lee y valida lo que escribió el usuario.** Si algo está mal (nombre inválido, país que no son 2 letras, correo mal escrito, días fuera de rango), llena `$resultado` con un error y no sigue.
+5. **Arma `$dn`.** Es la "identidad" del titular: país, localidad, organización, nombre común y correo. Con `array_filter` se quitan los campos vacíos.
+6. **Crea el certificado en tres funciones encadenadas:**
+
+   ```php
+   $pkey = openssl_pkey_new($config);                       // 1) crea el par de llaves
+   $csr  = openssl_csr_new($dn, $pkey, $config);            // 2) crea la solicitud con los datos del titular
+   $cert = openssl_csr_sign($csr, null, $pkey, $dias, $config); // 3) la firma
+   ```
+
+   El `null` del tercer paso significa "no hay otra autoridad": el certificado se firma con su propia llave. Por eso se llama **autofirmado**.
+7. **Convierte todo a texto PEM** con `openssl_x509_export` (certificado) y `openssl_pkey_export` (llave privada).
+8. **Guarda los archivos** con `file_put_contents` en `keysCert/<nombre>/`: `certout.crt` (certificado) y `privkey.pem` (llave privada). El nombre de carpeta se limpia (sin tildes ni espacios) para que sea seguro.
+9. **Muestra los datos del certificado.** `openssl_x509_parse` lee las fechas de vigencia y `openssl_x509_fingerprint` calcula la huella SHA-256.
+
+---
 
 ## 4.2. Evidencia de Firma7
 
-**Descripción:** En este apartado se colocará la captura de pantalla de la ejecución del script `Firma7` y del resultado obtenido.
+**Descripción:** En este apartado se muestra la ejecución del script `Firma7` (`Form_Firma7.php`) y el resultado obtenido. El formulario genera un par de llaves RSA por usuario, firma un mensaje con la llave privada y lo verifica con la llave pública.
+
+**Datos que solicita:** usuario (de 3 a 30 caracteres), mensaje y, de forma opcional, la casilla para generar llaves nuevas.
+
+**Resultado esperado:** al firmar, aviso verde «Mensaje firmado» con la llave pública y la firma en Base64. Al verificar, aviso «Firma válida» si el mensaje no cambió, o «Firma inválida» si fue alterado. Los archivos se guardan en `keys/<usuario>/`.
 
 **Captura de pantalla:**
 
-<!-- Insertar aquí la captura real de ejecución de Firma7. -->
+![Evidencia de Firma7](F7.png)
+
+**Cómo funciona el código, paso a paso:**
+
+1. **Configura OpenSSL y la carpeta `keys/`** igual que en FirmaOtra.
+2. **Valida el usuario** con una expresión regular: `/^[A-Za-z0-9_-]{3,30}$/`. Solo permite letras, números, guion y guion bajo. Esto evita que alguien escriba algo como `../` para guardar archivos fuera de `keys/`.
+3. **Si se presionó «Firmar»:**
+   - Si el usuario no tiene llaves (o se marcó «Generar llaves nuevas»), las crea:
+
+     ```php
+     $par = openssl_pkey_new($configArgs);          // crea el par de llaves
+     $det = openssl_pkey_get_details($par);         // de ahí se saca la llave pública: $det['key']
+     openssl_pkey_export($par, $privPem, null, $configArgs); // saca la privada como texto
+     ```
+
+   - Guarda `private_key.pem` y `public_key.pem` en `keys/<usuario>/`.
+   - Lee la llave privada con `openssl_get_privatekey` y firma:
+
+     ```php
+     openssl_sign($mensaje, $firma, $priv, OPENSSL_ALGO_SHA256);
+     ```
+
+     Esta función calcula la huella SHA-256 del mensaje y la protege con la llave privada. El resultado queda en `$firma` (la variable se llena "por referencia").
+   - Guarda la firma en `signature.dat` y la muestra con `base64_encode` para que sea legible.
+4. **Si se presionó «Verificar»:** lee la llave pública y la firma guardadas y usa:
+
+   ```php
+   openssl_verify($mensaje, $firma, $pub, OPENSSL_ALGO_SHA256) === 1
+   ```
+
+   La función devuelve `1` si la firma es válida, `0` si no coincide y `-1` si hubo un error. Si el mensaje tiene aunque sea una letra distinta, devuelve `0`.
+
+---
 
 ## 4.3. Evidencia de FirmaMensaje
 
-**Descripción:** En este apartado se colocará la captura de pantalla de la ejecución del script `FirmaMensaje` y del resultado obtenido.
+**Descripción:** En este apartado se muestra la ejecución del script `FirmaMensaje` (`Form_FirmaDigital.php`) y el resultado obtenido. El formulario firma un mensaje con la llave privada de un certificado ya creado y lo verifica con el certificado público.
+
+**Datos que solicita:** certificado (lista de los que existen en `keysCert/`), mensaje y firma en Base64 (se llena sola al firmar; para verificar se pega la firma recibida).
+
+**Resultado esperado:** al firmar, la firma en Base64 aparece en el cuadro correspondiente. Al verificar, aviso «Firma válida» con el nombre del titular del certificado, o «Firma inválida» si el mensaje fue modificado.
 
 **Captura de pantalla:**
 
-<!-- Insertar aquí la captura real de ejecución de FirmaMensaje. -->
+![Evidencia de FirmaMensaje](FD.png)
+
+**Cómo funciona el código, paso a paso:**
+
+1. **Busca los certificados disponibles.** La función `archivoCert()` revisa si una carpeta tiene `certout.crt` (o `certout.csr`). Con `glob()` se recorren las carpetas de `keysCert/` y solo se agregan a la lista `$disponibles` las que tienen **llave privada y certificado**. Esa lista llena el menú desplegable.
+2. **Valida la elección.** Comprueba que el certificado elegido esté en `$disponibles`. Así nadie puede inventar una ruta de archivo desde el navegador.
+3. **Lee el certificado** con `openssl_x509_parse` y toma el nombre común (`CN`) para saber a nombre de quién está.
+4. **Si se presionó «Firmar»:** carga la llave privada del certificado (`openssl_pkey_get_private`), firma con `openssl_sign` y convierte la firma a Base64 para mostrarla.
+5. **Si se presionó «Verificar»:**
+   - Convierte la firma de Base64 a binario con `base64_decode` (con el modo estricto `true`, para detectar texto dañado).
+   - Extrae la llave pública del certificado con `openssl_pkey_get_public($certPem)`.
+   - Llama a `openssl_verify`. Con resultado `1` dice que el mensaje es auténtico y firmado por el titular. Con `0` avisa que fue modificado o que la firma es de otro certificado.
+
+La diferencia con Firma7 es que aquí las llaves vienen de un **certificado** (que tiene nombre y vigencia), no de un par de llaves sueltas.
+
+---
 
 ## 4.4. Evidencia de cifrado con OpenSSL
 
-**Descripción:** En este apartado se colocará la captura de pantalla de la ejecución del script de cifrado y del resultado obtenido.
+**Descripción:** En este apartado se muestra la ejecución del script de cifrado (`Form_Encriptacion.php`) y el resultado obtenido. El formulario cifra y descifra texto con AES-128-CBC a partir de una clave.
+
+**Datos que solicita:** clave (mínimo 8 caracteres), mensaje y texto cifrado (se llena solo al cifrar; para descifrar se pega aquí).
+
+**Resultado esperado:** al cifrar, aviso «Mensaje cifrado» con el texto cifrado en Base64. Al descifrar con la clave correcta, aviso «Mensaje descifrado» y el texto original en el cuadro Mensaje. Con una clave incorrecta, aviso «No se pudo descifrar».
 
 **Captura de pantalla:**
 
-<!-- Insertar aquí la captura real de ejecución del cifrado con OpenSSL. -->
+![Evidencia de cifrado con OpenSSL](FE.png)
+
+**Cómo funciona el código, paso a paso:**
+
+Aquí **no hay llaves públicas ni privadas**: se usa una sola clave, la que escribe la persona. El archivo tiene tres funciones:
+
+1. **`derivarClave($clave, $sal)`:** AES necesita una clave de exactamente 16 bytes, y una contraseña escrita por una persona no tiene ese tamaño. Esta función usa `hash_pbkdf2` (100 000 repeticiones de SHA-256) para convertir la contraseña en una clave de 16 bytes. Las repeticiones hacen que adivinar contraseñas sea muy lento.
+2. **`cifrar($texto, $clave)`:**
+   - Crea una **sal** de 16 bytes aleatorios (`random_bytes`). Es un valor al azar que se mezcla con la contraseña.
+   - Crea un **IV** de 16 bytes aleatorios. Es otro valor al azar que hace que el cifrado cambie cada vez.
+   - Cifra con `openssl_encrypt(texto, 'AES-128-CBC', clave derivada, ..., iv)`.
+   - Une todo en un solo paquete: `sal + iv + texto cifrado`, y lo pasa a Base64.
+3. **`descifrar($paquete, $clave)`:**
+   - Pasa el Base64 a binario y lo **corta en tres partes** con `substr`: los primeros 16 bytes son la sal, los siguientes 16 son el IV y el resto es el texto cifrado.
+   - Vuelve a derivar la clave con la misma contraseña y la misma sal.
+   - Descifra con `openssl_decrypt`. Si la contraseña es incorrecta, la función devuelve `false` y se muestra el error.
+
+**Por qué sale distinto cada vez:** la sal y el IV son aleatorios, así que el mismo mensaje con la misma clave produce un resultado diferente cada vez que se cifra. Aun así se puede descifrar, porque la sal y el IV viajan dentro del paquete (no son secretos, lo secreto es la clave).
+
+---
+
+## 4.5. Evidencia de Firma4
+
+**Descripción:** En este apartado se muestra la ejecución del script `Firma4` (`Form_Firma4.php`) y el resultado obtenido. El formulario genera una llave privada RSA y una solicitud de certificado (CSR).
+
+**Datos que solicita:** nombre común (obligatorio), organización, departamento, ciudad, provincia o estado, país y correo.
+
+**Resultado esperado:** aviso verde «Solicitud creada», con el CSR en pantalla y el enlace para descargar `request.csr`. Los archivos `private.key` y `request.csr` quedan en `keys/<nombre>/`.
+
+**Captura de pantalla:**
+
+![Evidencia de Firma4](F4.png)
+
+**Cómo funciona el código, paso a paso:**
+
+1. **Configura OpenSSL** buscando `openssl.cnf` y crea la carpeta `keys/` protegida, igual que los anteriores.
+2. **Lee los siete campos** con un `foreach` sobre la lista `$campos` y los guarda en el arreglo `$v`.
+3. **Valida** el nombre común, el país (2 letras) y el correo.
+4. **Arma `$dn`** (los datos de identidad) quitando los campos vacíos.
+5. **Genera la solicitud:**
+
+   ```php
+   $pkey = openssl_pkey_new($config);              // crea el par de llaves
+   $csr  = openssl_csr_new($dn, $pkey, $config);   // crea la solicitud con la identidad
+   openssl_csr_export($csr, $csrPem);              // la pasa a texto PEM
+   openssl_pkey_export($pkey, $privPem, null, $config); // la llave privada a texto
+   ```
+
+6. **Guarda** `private.key` y `request.csr` en `keys/<nombre>/`.
+7. **Ofrece la descarga** con un enlace `data:` que contiene el texto del CSR (`rawurlencode` lo prepara para ir dentro del enlace), así no hace falta crear otro archivo.
+
+**Diferencia con FirmaOtra:** aquí se termina en la solicitud (`openssl_csr_new`). **No** se llama a `openssl_csr_sign`, porque quien debe firmarla y emitir el certificado es una autoridad certificadora externa.
+
+---
+
+## 4.6. Evidencia de FirmaDiprenaGuardar
+
+**Descripción:** En este apartado se muestra la ejecución del script `FirmaDiprenaGuardar` (`Form_DiprenaAprobacion.php`) y el resultado obtenido. El formulario aprueba uno o más trámites de Diprena y firma los datos de cada cargo.
+
+**Datos que solicita:** una o más filas con el id del trámite y su sello.
+
+**Resultado esperado:** aviso verde «Aprobación firmada» y, en «Salida del proceso», la cadena generada, la firma en Base64 y la verificación de la firma.
+
+**Captura de pantalla:**
+
+![Evidencia de FirmaDiprenaGuardar](FDG.png)
+
+**Cómo funciona el código, paso a paso:**
+
+Aquí intervienen **tres archivos** que trabajan en cadena:
+
+`Form_DiprenaAprobacion.php` (el formulario) → `DiprenaGuardarAprobacion.php` (la aprobación) → `firmaDiprena.php` (la firma).
+
+**1. El formulario (`Form_DiprenaAprobacion.php`):**
+
+- Los campos se llaman `id[]` y `sello[]`. Los corchetes hacen que PHP reciba **listas**, una posición por cada fila agregada.
+- Recorre las dos listas a la vez y arma el arreglo `$validos` con la forma `[id => sello]`. El id debe ser número y el sello solo letras, números, guion y guion bajo.
+- Entrega ese arreglo al script original con `$_REQUEST['aprobarDIPRENA'] = $validos;`, que es lo que ese script espera.
+- Usa un truco para capturar la salida:
+
+  ```php
+  ob_start();                                   // empieza a "grabar" todo lo que se imprima
+  include 'DiprenaGuardarAprobacion.php';       // ejecuta el script (que imprime con echo)
+  $salida = ob_get_clean();                     // detiene la grabación y devuelve el texto
+  ```
+
+  Así lo que el script imprime no se ve suelto en la página, sino dentro del cuadro «Salida del proceso».
+- Revisa si la salida contiene `la firma es valida` para decidir si el aviso es verde o rojo.
+- El botón «+ Agregar trámite» usa un pequeño JavaScript que **clona** una fila vacía.
+
+**2. `DiprenaGuardarAprobacion.php`:** por cada trámite de la lista (`foreach`):
+
+- Consulta el trámite en la tabla `tramitescargo`. En esta versión de pruebas las funciones `mysql_*` están **simuladas**, devuelven datos de ejemplo, porque no hay base de datos conectada.
+- Calcula los números de resuelto y de documento y hace el `UPDATE` (también simulado).
+- Junta los datos del cargo (posición, salario, ocupación, identificación, nombres y apellidos) en **una sola cadena de texto** llamada `$datos`.
+- Incluye `firmaDiprena.php` para firmar esa cadena.
+
+**3. `firmaDiprena.php`:** lee `keys/private_key.pem` y `keys/public_key.pem`, firma `$datos` con `openssl_sign`, guarda la firma en `keys/signature<id>.dat`, imprime la firma en Base64 y la verifica con `openssl_verify`.
+
+**Idea clave:** lo que se firma es la cadena con los datos del cargo. Si alguien cambia el salario o un nombre después, la firma deja de ser válida.
+
+---
+
+## 4.7. Evidencia de FirmaDiprena
+
+**Descripción:** En este apartado se muestra la ejecución del script `FirmaDiprena` (`Form_FirmaDiprena.php`) y el resultado obtenido. El formulario firma y verifica los datos de un cargo con las llaves existentes en `keys/`.
+
+**Datos que solicita:** id del cargo y datos a firmar.
+
+**Resultado esperado:** al firmar, aviso «Mensaje firmado» con la firma en Base64, guardada en `keys/signature<id>.dat`. Al verificar, aviso «Firma válida» o «Firma inválida» según los datos coincidan con la firma guardada.
+
+**Captura de pantalla:**
+
+![Evidencia de FirmaDiprena](FDP.png)
+
+**Cómo funciona el código, paso a paso:**
+
+1. **Lee los dos campos:** `idCargo` (reemplaza a la variable `$idCargoActual` del script original) y `datos` (reemplaza a `$datos`).
+2. **Valida** que el id sea solo números con `ctype_digit`, que haya datos y que existan `keys/private_key.pem` y `keys/public_key.pem`. Este formulario **no crea llaves**: usa las que ya existen.
+3. **Nombre del archivo de firma:** `keys/signature` + id + `.dat`. Por eso cada cargo tiene su propia firma (por ejemplo `signature1.dat`, `signature2.dat`).
+4. **Si se presionó «Firmar datos»:**
+   - Carga la llave privada con `openssl_get_privatekey`.
+   - Firma con `openssl_sign($datos, $firma, $llavePrivada, OPENSSL_ALGO_SHA256)`.
+   - Guarda la firma con `file_put_contents`.
+   - La verifica enseguida con `openssl_verify` y la muestra en Base64.
+5. **Si se presionó «Verificar firma»:** lee el archivo `signature<id>.dat` y comprueba que los datos escritos coincidan con esa firma. Si cambias una letra de los datos, el resultado es «Firma inválida».
+
+---
+
+## Resumen de las funciones `openssl_*` usadas
+
+| Función | Para qué sirve |
+|---|---|
+| `openssl_pkey_new` | Crea un par de llaves (privada y pública). |
+| `openssl_pkey_export` | Convierte la llave privada a texto PEM para guardarla. |
+| `openssl_pkey_get_details` | Obtiene datos de la llave, entre ellos la llave pública. |
+| `openssl_get_privatekey` / `openssl_pkey_get_private` | Carga una llave privada desde su texto PEM. |
+| `openssl_pkey_get_public` | Carga una llave pública (por ejemplo, desde un certificado). |
+| `openssl_sign` | Firma datos con la llave privada. |
+| `openssl_verify` | Comprueba una firma con la llave pública. Devuelve `1` si es válida. |
+| `openssl_csr_new` / `openssl_csr_export` | Crea y exporta una solicitud de certificado (CSR). |
+| `openssl_csr_sign` | Firma una solicitud y crea el certificado. |
+| `openssl_x509_export` / `openssl_x509_parse` / `openssl_x509_fingerprint` | Exporta un certificado, lee sus datos y calcula su huella. |
+| `openssl_encrypt` / `openssl_decrypt` | Cifra y descifra texto con AES. |
+| `openssl_error_string` | Devuelve el texto del último error de OpenSSL. Se usa para mostrar por qué falló algo. |
 
 # 5. 🔐 Documentación técnica de las funciones
 
